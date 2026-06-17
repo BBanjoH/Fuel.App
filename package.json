@@ -1,0 +1,19 @@
+{
+  "name": "fuelnow-nigeria",
+  "version": "1.0.0",
+  "description": "Real-time fuel availability tracker for Nigeria",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"No tests specified\""
+  },
+  "keywords": [
+    "fuel",
+    "nigeria",
+    "pwa"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
+  }
+}

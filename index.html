@@ -966,7 +966,7 @@ function updateLastUpdated() {
     ' · ' + now.toLocaleDateString('en-NG', { day: 'numeric', month: 'short' });
 }
 
-// ── State Loading ──────────────────────────────────────
+// ── State Loading ───────��──────────────────────────────
 function loadState(state) {
   if (!state) {
     document.getElementById('welcomeState').style.display = '';
@@ -1286,5 +1286,9 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 </script>
+
+<!-- Vercel Speed Insights -->
+<script type="module" src="/speed-insights.js"></script>
+
 </body>
 </html>
