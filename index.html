@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en-NG">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#008751">
+<meta name="description" content="Find petrol (PMS) and diesel (AGO) availability at filling stations across all Nigerian states in real time.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FuelNow">
+<meta property="og:title" content="FuelNow Nigeria — Real-time Fuel Availability">
+<meta property="og:description" content="Find petrol and diesel at filling stations across Nigeria">
+<meta property="og:type" content="website">
+<link rel="manifest" href="/fuel/manifest.json">
+<title>FuelNow Nigeria — Fuel Availability Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --green: #008751;
+    --green-dark: #006640;
+    --green-light: #00a862;
+    --green-pale: #e8f5ee;
+    --white: #ffffff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+    --available: #16a34a;
+    --limited: #d97706;
+    --unavailable: #dc2626;
+    --available-bg: #dcfce7;
+    --limited-bg: #fef3c7;
+    --unavailable-bg: #fee2e2;
+    --ad-bg: #fffbeb;
+    --ad-border: #fbbf24;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-800);
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 60%, var(--green-light) 100%);
+    color: white;
+    padding: 16px 16px 0;
+    padding-top: calc(16px + env(safe-area-inset-top));
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,135,81,0.35);
+  }
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 38px;
+    height: 38px;
+    background: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .logo-text { line-height: 1.1; }
+  .logo-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo-sub { font-size: 11px; opacity: 0.85; font-weight: 500; }
+
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+
+  .btn-install {
+    background: white;
+    color: var(--green);
+    border: none;
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.15s;
+  }
+.btn-install:active { transform: scale(0.96); }
+  .btn-install.visible { display: flex; }
+
+  .live-badge {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    background: #4ade80;
+    border-radius: 50%;
+    animation: pulse-dot 1.5s infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.8); }
+  }
+
+  /* ── State Selector ── */
+  .state-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding-bottom: 14px;
+  }
+
+  .state-select-wrap { flex: 1; position: relative; }
+  .state-select-wrap::after {
+    content: '▼';
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: var(--green);
+    pointer-events: none;
+  }
+select {
+    width: 100%;
+    padding: 10px 32px 10px 14px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: white;
+    color: var(--gray-800);
+    font-size: 15px;
+    font-weight: 600;
+    appearance: none;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+
+  .btn-locate {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: white;
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-locate:active { background: rgba(255,255,255,0.35); }
+
+  /* ── Main Content ── */
+  .main { padding: 16px; max-width: 640px; margin: 0 auto; }
+
+  /* ── Stats Bar ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 12px 10px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat-num { font-size: 22px; font-weight: 800; line-height: 1; }
+  .stat-label { font-size: 11px; color: var(--gray-600); margin-top: 3px; font-weight: 500; }
+  .stat-num.green { color: var(--available); }
+  .stat-num.orange { color: var(--limited); }
+  .stat-num.red { color: var(--unavailable); }
+
+  /* ── Search ── */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 14px;
+  }
+.search-wrap::before {
+    content: '🔍';
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+  }
+  .search-input {
+    width: 100%;
+    padding: 12px 40px 12px 40px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--gray-200);
+    background: white;
+    font-size: 15px;
+    color: var(--gray-800);
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--green); }
+
+  /* ── Filter Tabs ── */
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .filter-tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--gray-200);
+    background: white;
+    color: var(--gray-600);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .tab.active {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,135,81,0.3);
+  }
+
+  /* ── Section Header ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--gray-800); }
+  .section-count { font-size: 13px; color: var(--gray-400); font-weight: 500; }
+
+  /* ── Station Card ── */
+  .station-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid transparent;
+    transition: transform 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+  }
+  .station-card:active { transform: scale(0.99); box-shadow: var(--shadow-lg); }
+  .station-card.border-available { border-left-color: var(--available); }
+  .station-card.border-limited { border-left-color: var(--limited); }
+  .station-card.border-unavailable { border-left-color: var(--unavailable); }
+
+  .station-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .station-info { flex: 1; min-width: 0; }
+  .station-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .station-address {
+    font-size: 12px;
+    color: var(--gray-600);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .station-brand {
+    background: var(--green-pale);
+    color: var(--green-dark);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── Fuel Indicators ── */
+  .fuel-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .fuel-badge {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 700;
+  }
+.fuel-badge.available { background: var(--available-bg); color: var(--available); }
+  .fuel-badge.limited { background: var(--limited-bg); color: var(--limited); }
+  .fuel-badge.unavailable { background: var(--unavailable-bg); color: var(--unavailable); }
+
+  .fuel-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .fuel-badge.available .fuel-dot { background: var(--available); }
+  .fuel-badge.limited .fuel-dot { background: var(--limited); }
+  .fuel-badge.unavailable .fuel-dot { background: var(--unavailable); }
+
+  /* ── Station Meta ── */
+  .station-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--gray-400);
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .queue-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--gray-100);
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .queue-badge.short { color: var(--available); }
+  .queue-badge.medium { color: var(--limited); }
+  .queue-badge.long { color: var(--unavailable); }
+
+  .report-btn {
+    background: none;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--green);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .report-btn:hover { background: var(--green-pale); border-color: var(--green); }
+
+  /* ── Advertisement ── */
+  .ad-card {
+    background: var(--ad-bg);
+    border: 1.5px solid var(--ad-border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ad-label {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: var(--ad-border);
+    color: #78350f;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .ad-content { display: flex; gap: 12px; align-items: center; }
+  .ad-icon { font-size: 36px; flex-shrink: 0; }
+  .ad-text {}
+  .ad-headline { font-size: 14px; font-weight: 700; color: var(--gray-800); margin-bottom: 3px; }
+  .ad-body { font-size: 12px; color: var(--gray-600); line-height: 1.4; }
+  .ad-cta {
+    display: inline-block;
+    margin-top: 8px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .ad-banner {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .ad-banner::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+  }
+  .ad-banner .ad-label { background: rgba(255,255,255,0.2); color: white; top: 8px; right: 8px; }
+  .ad-banner-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .ad-banner-sub { font-size: 12px; opacity: 0.85; margin-bottom: 10px; }
+  .ad-banner-cta {
+    background: white;
+    color: #2563eb;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* ── Report Modal ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 500;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: var(--radius) var(--radius) 0 0;
+    width: 100%;
+    max-width: 640px;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    animation: slide-up 0.25s ease;
+  }
+
+  @keyframes slide-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--gray-200);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .modal-sub { font-size: 13px; color: var(--gray-600); margin-bottom: 18px; }
+
+  .fuel-report-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .fuel-report-group { }
+  .fuel-report-label { font-size: 12px; font-weight: 700; color: var(--gray-600); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .status-options { display: flex; flex-direction: column; gap: 6px; }
+
+  .status-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-200);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .status-option.selected-available { background: var(--available-bg); border-color: var(--available); color: var(--available); }
+  .status-option.selected-limited { background: var(--limited-bg); border-color: var(--limited); color: var(--limited); }
+  .status-option.selected-unavailable { background: var(--unavailable-bg); border-color: var(--unavailable); color: var(--unavailable); }
+
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dot-available { background: var(--available); }
+  .dot-limited { background: var(--limited); }
+  .dot-unavailable { background: var(--unavailable); }
+
+  .queue-section { margin-bottom: 18px; }
+  .queue-label { font-size: 12px; font-weight: 700; color: var(--gray-600); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .queue-options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .queue-opt {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--gray-200);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--gray-600);
+    transition: all 0.15s;
+  }
+  .queue-opt.selected { background: var(--green); color: white; border-color: var(--green); }
+.modal-actions { display: flex; gap: 10px; }
+
+  .btn-cancel {
+    flex: 1;
+    padding: 13px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--gray-200);
+    background: white;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray-600);
+    cursor: pointer;
+  }
+
+  .btn-submit {
+    flex: 2;
+    padding: 13px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--green);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,135,81,0.3);
+    transition: transform 0.15s;
+  }
+  .btn-submit:active { transform: scale(0.98); }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--gray-800);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+    box-shadow: var(--shadow-lg);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── Legend ── */
+  .legend {
+    background: white;
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+
+  .legend-title { font-size: 12px; font-weight: 700; color: var(--gray-600); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .legend-items { display: flex; gap: 14px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--gray-600); font-weight: 500; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── Empty State ── */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-400);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-text { font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--gray-600); }
+  .empty-sub { font-size: 13px; }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--gray-400);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .footer a { color: var(--green); text-decoration: none; font-weight: 600; }
+
+  /* ── Responsive ── */
+  @media (min-width: 480px) {
+    .fuel-row { gap: 10px; }
+    .station-name { font-size: 16px; }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #111; }
+    .header { background: linear-gradient(135deg, #003d25 0%, #006640 60%, #008751 100%); }
+    .stat-card, .station-card, .search-input, select, .legend, .modal { background: #1e1e1e; color: #f1f1f1; }
+    .station-name { color: #f1f1f1; }
+    .gray-200 { border-color: #333; }
+    .search-input { border-color: #333; color: #f1f1f1; }
+    .tab { background: #1e1e1e; color: #aaa; border-color: #333; }
+    .queue-opt { background: #1e1e1e; border-color: #333; color: #aaa; }
+    .status-option { border-color: #333; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header class="header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-icon">⛽</div>
+      <div class="logo-text">
+        <div class="logo-title">FuelNow</div>
+        <div class="logo-sub">Nigeria Fuel Finder</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+      <button class="btn-install" id="installBtn" onclick="installApp()">📲 Install</button>
+    </div>
+  </div>
+  <div class="state-bar">
+    <div class="state-select-wrap">
+      <select id="stateSelect" onchange="loadState(this.value)">
+        <option value="">— Select Your State —</option>
+      </select>
+    </div>
+    <button class="btn-locate" onclick="detectLocation()" title="Auto-detect location">📍</button>
+  </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<main class="main" id="mainContent">
+
+  <!-- Welcome State -->
+  <div id="welcomeState">
+    <!-- Top Ad Banner -->
+    <div class="ad-banner">
+      <div class="ad-label">AD</div>
+      <div class="ad-banner-title">🚗 AutoCare Nigeria</div>
+      <div class="ad-banner-sub">Premium car maintenance at your doorstep. Trusted by 50,000+ Nigerians.</div>
+      <button class="ad-banner-cta" onclick="adClick('autocare')">Get Free Quote</button>
+    </div>
+
+    <div class="empty-state">
+      <div class="empty-icon">🗺️</div>
+      <div class="empty-text">Find Fuel Near You</div>
+      <div class="empty-sub">Select your state above or tap 📍 to auto-detect your location and see real-time fuel availability at filling stations near you.</div>
+    </div>
+
+    <!-- Mid Ad -->
+    <div class="ad-card" style="margin-top:16px">
+      <div class="ad-label">SPONSORED</div>
+      <div class="ad-content">
+        <div class="ad-icon">🏦</div>
+        <div class="ad-text">
+          <div class="ad-headline">GTBank Business Account</div>
+          <div class="ad-body">Open a business account in 5 minutes. Zero maintenance fee for 6 months.</div>
+          <button class="ad-cta" onclick="adClick('gtbank')">Open Account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Ad -->
+    <div class="ad-card">
+      <div class="ad-label">AD</div>
+      <div class="ad-content">
+        <div class="ad-icon">⚡</div>
+        <div class="ad-text">
+          <div class="ad-headline">Solar Energy Solutions</div>
+          <div class="ad-body">Stop depending on fuel generators. Install solar today from ₦350,000.</div>
+          <button class="ad-cta" onclick="adClick('solar')">Learn More</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State Results State -->
+  <div id="resultsState" style="display:none">
+
+    <!-- Stats -->
+    <div class="stats-bar" id="statsBar"></div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <input class="search-input" type="search" id="searchInput" placeholder="Search station or area..." oninput="filterStations()">
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <div class="tab active" onclick="setFilter('all', this)">All Stations</div>
+      <div class="tab" onclick="setFilter('petrol', this)">⛽ Has Petrol</div>
+      <div class="tab" onclick="setFilter('diesel', this)">🛢️ Has Diesel</div>
+      <div class="tab" onclick="setFilter('both', this)">✅ Both Available</div>
+      <div class="tab" onclick="setFilter('queue-short', this)">🚗 Short Queue</div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-title">Status Key</div>
+      <div class="legend-items">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--available)"></div> Available</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--limited)"></div> Limited / Queue</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--unavailable)"></div> Unavailable</div>
+      </div>
+    </div>
+
+    <!-- Top Ad in Results -->
+    <div class="ad-banner" id="topResultsAd">
+      <div class="ad-label">AD</div>
+      <div class="ad-banner-title">🛵 Send It Express</div>
+      <div class="ad-banner-sub">Same-day delivery across Nigeria. Track your packages live.</div>
+      <button class="ad-banner-cta" onclick="adClick('sendit')">Send a Package</button>
+    </div>
+
+    <!-- Station List -->
+    <div class="section-header">
+      <div class="section-title" id="stateHeading">Filling Stations</div>
+      <div class="section-count" id="stationCount"></div>
+    </div>
+
+    <div id="stationList"></div>
+
+    <!-- Mid-list Ad (inserted dynamically after 4 stations) -->
+
+    <!-- Bottom Ad -->
+    <div class="ad-card" id="bottomAd" style="margin-top:6px">
+      <div class="ad-label">SPONSORED</div>
+      <div class="ad-content">
+        <div class="ad-icon">🚕</div>
+        <div class="ad-text">
+          <div class="ad-headline">Bolt — Rides That Work</div>
+          <div class="ad-body">Skip the queue stress. Book a Bolt ride instead. New users get ₦500 off first ride.</div>
+          <button class="ad-cta" onclick="adClick('bolt')">Get ₦500 Off</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Data crowd-sourced by Nigerians for Nigerians 🇳🇬<br>
+      Last updated: <span id="lastUpdated"></span><br><br>
+      <a href="#" onclick="openReport(null, 'New Station')">➕ Add a station</a> &nbsp;|&nbsp;
+      <a href="mailto:fuelnow@example.com">Advertise with us</a>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ REPORT MODAL ══ -->
+<div class="modal-overlay" id="reportModal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalStationName">Report Fuel Status</div>
+    <div class="modal-sub">Help others by reporting what you see right now</div>
+
+    <div class="fuel-report-grid">
+      <div class="fuel-report-group">
+        <div class="fuel-report-label">⛽ Petrol (PMS)</div>
+        <div class="status-options" id="petrolOptions">
+          <div class="status-option" onclick="selectStatus('petrol','available',this)"><div class="status-dot dot-available"></div> Available</div>
+          <div class="status-option" onclick="selectStatus('petrol','limited',this)"><div class="status-dot dot-limited"></div> Limited</div>
+          <div class="status-option" onclick="selectStatus('petrol','unavailable',this)"><div class="status-dot dot-unavailable"></div> None</div>
+        </div>
+      </div>
+      <div class="fuel-report-group">
+        <div class="fuel-report-label">🛢️ Diesel (AGO)</div>
+        <div class="status-options" id="dieselOptions">
+          <div class="status-option" onclick="selectStatus('diesel','available',this)"><div class="status-dot dot-available"></div> Available</div>
+          <div class="status-option" onclick="selectStatus('diesel','limited',this)"><div class="status-dot dot-limited"></div> Limited</div>
+          <div class="status-option" onclick="selectStatus('diesel','unavailable',this)"><div class="status-dot dot-unavailable"></div> None</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="queue-section">
+      <div class="queue-label">🚗 Queue Length</div>
+      <div class="queue-options">
+        <div class="queue-opt" onclick="selectQueue('none',this)">No Queue</div>
+        <div class="queue-opt" onclick="selectQueue('short',this)">Short (&lt;10 cars)</div>
+        <div class="queue-opt" onclick="selectQueue('medium',this)">Medium</div>
+        <div class="queue-opt" onclick="selectQueue('long',this)">Long (&gt;30 cars)</div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" onclick="submitReport()">✅ Submit Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Data ──────────────────────────────────────────────
+const NIGERIAN_STATES = [
+  'Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa','Benue','Borno',
+  'Cross River','Delta','Ebonyi','Edo','Ekiti','Enugu','FCT – Abuja','Gombe',
+  'Imo','Jigawa','Kaduna','Kano','Katsina','Kebbi','Kogi','Kwara','Lagos',
+  'Nasarawa','Niger','Ogun','Ondo','Osun','Oyo','Plateau','Rivers','Sokoto',
+  'Taraba','Yobe','Zamfara'
+];
+
+const BRANDS = ['NNPCL','Ardova','TotalEnergies','MRS','Conoil','Oando','AA Rescue','Ruby','Rainoil','Enyo'];
+
+const STATUS = ['available','available','available','limited','unavailable'];
+
+const AREAS = {
+  'Lagos': ['Ikeja','Victoria Island','Lekki','Surulere','Yaba','Apapa','Alimosho','Ikorodu','Badagry','Agege','Ojodu','Festac','Ajah','Ibeju-Lekki','Mushin'],
+  'Abuja': ['Wuse','Garki','Maitama','Asokoro','Gwarinpa','Jabi','Kubwa','Lugbe','Apo','Gudu','Dawaki','Karu'],
+  'FCT – Abuja': ['Wuse','Garki','Maitama','Asokoro','Gwarinpa','Jabi','Kubwa','Lugbe','Apo','Gudu','Dawaki'],
+  'Kano': ['Sabon Gari','Bompai','Nassarawa','Fagge','Gwale','Dala','Tudun Wada','Kano Municipal','Ungogo'],
+  'Rivers': ['Port Harcourt','Rumuola','Eleme','Oyigbo','Obio-Akpor','Emohua','Bonny','Ikwerre','Omuma'],
+  'Oyo': ['Ibadan','Bodija','Ring Road','Agodi','Challenge','Eleyele','Ojoo','Sango','Dugbe','Iyaganku'],
+  'Anambra': ['Onitsha','Nnewi','Awka','Ekwulobia','Ogidi','Nkpor','Obosi','Agulu'],
+  'Delta': ['Asaba','Warri','Ughelli','Sapele','Agbor','Ozoro','Isoko','Uvwie'],
+  'Edo': ['Benin City','Auchi','Ekpoma','Uromi','Igarra','Ubiaja','Igueben','Irrua'],
+  'Enugu': ['Enugu','Nsukka','Agbani','Udi','Awgu','Oji River','Oji River South'],
+};
+
+const GENERIC_AREAS = ['GRA','Town Centre','Old Road','New Road','Market Area','Ring Road','Main Street','Junction','Expressway','Bypass','By-Pass'];
+
+function getRandAreas(state) {
+  return AREAS[state] || GENERIC_AREAS;
+}
+
+function seedRand(seed) {
+  let s = seed;
+  return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+
+function generateStations(state) {
+  const rand = seedRand(state.split('').reduce((a,c) => a + c.charCodeAt(0), 0));
+  const areas = getRandAreas(state);
+  const count = Math.floor(rand() * 6) + 10; // 10-15 stations
+  const stations = [];
+  const usedNames = new Set();
+
+  for (let i = 0; i < count; i++) {
+    const brand = BRANDS[Math.floor(rand() * BRANDS.length)];
+    const area = areas[Math.floor(rand() * areas.length)];
+    let name = `${brand} Filling Station – ${area}`;
+    if (usedNames.has(name)) name = `${brand} Service Station – ${area} ${i+1}`;
+    usedNames.add(name);
+
+    const petrol = STATUS[Math.floor(rand() * STATUS.length)];
+    const diesel = STATUS[Math.floor(rand() * STATUS.length)];
+    const queues = ['none','short','medium','long'];
+    const queue = (petrol === 'unavailable' && diesel === 'unavailable')
+      ? 'none'
+      : queues[Math.floor(rand() * queues.length)];
+
+    const minutesAgo = Math.floor(rand() * 90) + 5;
+    const reports = Math.floor(rand() * 24) + 1;
+    const streets = ['No. '+Math.floor(rand()*200+1),'Along','Off','Near'];
+    const address = `${streets[Math.floor(rand()*streets.length)]} ${area} Road, ${state}`;
+
+    stations.push({ id: i, name, brand, area, address, petrol, diesel, queue, minutesAgo, reports });
+  }
+  return stations;
+}
+
+// ── App State ──────────────────────────────────────────
+let currentState = '';
+let allStations = [];
+let filteredStations = [];
+let activeFilter = 'all';
+let reportTarget = null;
+let reportSelections = { petrol: null, diesel: null, queue: null };
+let deferredInstallPrompt = null;
+
+// ── Init ───────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  populateStateSelect();
+  updateLastUpdated();
+  setInterval(updateLastUpdated, 60000);
+  registerSW();
+
+  const saved = localStorage.getItem('fuelnow_state');
+  if (saved) {
+    document.getElementById('stateSelect').value = saved;
+    loadState(saved);
+  }
+});
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('installBtn').classList.add('visible');
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBtn').classList.remove('visible');
+  showToast('✅ FuelNow installed successfully!');
+});
+
+function registerSW() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/fuel/sw.js').catch(() => {});
+  }
+}
+
+function populateStateSelect() {
+  const sel = document.getElementById('stateSelect');
+  NIGERIAN_STATES.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    sel.appendChild(opt);
+  });
+}
+
+function updateLastUpdated() {
+  const now = new Date();
+  document.getElementById('lastUpdated').textContent =
+    now.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' }) +
+    ' · ' + now.toLocaleDateString('en-NG', { day: 'numeric', month: 'short' });
+}
+
+// ── State Loading ──────────────────────────────────────
+function loadState(state) {
+  if (!state) {
+    document.getElementById('welcomeState').style.display = '';
+    document.getElementById('resultsState').style.display = 'none';
+    return;
+  }
+  currentState = state;
+  localStorage.setItem('fuelnow_state', state);
+  activeFilter = 'all';
+
+  // Reset filter tabs
+  document.querySelectorAll('.filter-tabs .tab').forEach((t,i) => {
+    t.classList.toggle('active', i === 0);
+  });
+
+  allStations = generateStations(state);
+  filteredStations = [...allStations];
+
+  document.getElementById('welcomeState').style.display = 'none';
+  document.getElementById('resultsState').style.display = '';
+  document.getElementById('stateHeading').textContent = `${state} — Filling Stations`;
+  document.getElementById('searchInput').value = '';
+
+  renderStats();
+  renderStations();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Filtering ──────────────────────────────────────────
+function setFilter(filter, el) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function filterStations() {
+  applyFilters();
+}
+
+function applyFilters() {
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  filteredStations = allStations.filter(s => {
+    const matchSearch = !query ||
+      s.name.toLowerCase().includes(query) ||
+      s.area.toLowerCase().includes(query) ||
+      s.brand.toLowerCase().includes(query) ||
+      s.address.toLowerCase().includes(query);
+
+    let matchFilter = true;
+    if (activeFilter === 'petrol') matchFilter = s.petrol === 'available' || s.petrol === 'limited';
+    else if (activeFilter === 'diesel') matchFilter = s.diesel === 'available' || s.diesel === 'limited';
+    else if (activeFilter === 'both') matchFilter = (s.petrol === 'available' || s.petrol === 'limited') && (s.diesel === 'available' || s.diesel === 'limited');
+    else if (activeFilter === 'queue-short') matchFilter = s.queue === 'none' || s.queue === 'short';
+
+    return matchSearch && matchFilter;
+  });
+
+  renderStations();
+}
+
+// ── Rendering ──────────────────────────────────────────
+function renderStats() {
+  const avail = allStations.filter(s => s.petrol === 'available' || s.diesel === 'available').length;
+  const limited = allStations.filter(s => s.petrol === 'limited' || s.diesel === 'limited').length;
+  const none = allStations.filter(s => s.petrol === 'unavailable' && s.diesel === 'unavailable').length;
+
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-num green">${avail}</div>
+      <div class="stat-label">Has Fuel</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num orange">${limited}</div>
+      <div class="stat-label">Limited</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num red">${none}</div>
+      <div class="stat-label">No Fuel</div>
+    </div>
+  `;
+}
+
+function statusLabel(s) {
+  if (s === 'available') return 'Available';
+  if (s === 'limited') return 'Limited';
+  return 'Unavailable';
+}
+
+function queueClass(q) {
+  if (q === 'none') return 'short';
+  if (q === 'short') return 'short';
+  if (q === 'medium') return 'medium';
+  return 'long';
+}
+
+function queueLabel(q) {
+  if (q === 'none') return '🟢 No Queue';
+  if (q === 'short') return '🟡 Short Queue';
+  if (q === 'medium') return '🟠 Medium Queue';
+  return '🔴 Long Queue';
+}
+
+function cardBorder(s) {
+  if (s.petrol === 'available' || s.diesel === 'available') return 'border-available';
+  if (s.petrol === 'limited' || s.diesel === 'limited') return 'border-limited';
+  return 'border-unavailable';
+}
+
+function timeLabel(min) {
+  if (min < 60) return `${min}m ago`;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return m > 0 ? `${h}h ${m}m ago` : `${h}h ago`;
+}
+
+const MID_AD_HTML = `
+  <div class="ad-card" style="margin-bottom:10px">
+    <div class="ad-label">AD</div>
+    <div class="ad-content">
+      <div class="ad-icon">🔋</div>
+      <div class="ad-text">
+        <div class="ad-headline">Felicity Solar</div>
+        <div class="ad-body">Power your home 24/7. Free installation on all orders above ₦800,000.</div>
+        <button class="ad-cta" onclick="adClick('felicity')">Get a Quote</button>
+      </div>
+    </div>
+  </div>`;
+
+const MID_AD_2_HTML = `
+  <div class="ad-banner" style="margin-bottom:10px">
+    <div class="ad-label">AD</div>
+    <div class="ad-banner-title">🏠 PropertyPro Nigeria</div>
+    <div class="ad-banner-sub">Find verified properties across Nigeria. No agent fees.</div>
+    <button class="ad-banner-cta" onclick="adClick('propertypro')">Browse Properties</button>
+  </div>`;
+
+function renderStations() {
+  const list = document.getElementById('stationList');
+  const count = document.getElementById('stationCount');
+
+  if (filteredStations.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-text">No stations found</div>
+        <div class="empty-sub">Try a different filter or search term</div>
+      </div>`;
+    count.textContent = '0 stations';
+    return;
+  }
+
+  count.textContent = `${filteredStations.length} station${filteredStations.length !== 1 ? 's' : ''}`;
+
+  let html = '';
+  filteredStations.forEach((s, i) => {
+    if (i === 4) html += MID_AD_HTML;
+    if (i === 9) html += MID_AD_2_HTML;
+
+    html += `
+      <div class="station-card ${cardBorder(s)}" onclick="openReport(${s.id}, '${s.name.replace(/'/g,"\\'")}')">
+        <div class="station-top">
+          <div class="station-info">
+            <div class="station-name">${s.name}</div>
+            <div class="station-address">📍 ${s.address}</div>
+          </div>
+          <div class="station-brand">${s.brand}</div>
+        </div>
+        <div class="fuel-row">
+          <div class="fuel-badge ${s.petrol}">
+            <div class="fuel-dot"></div>
+            ⛽ PMS · ${statusLabel(s.petrol)}
+          </div>
+          <div class="fuel-badge ${s.diesel}">
+            <div class="fuel-dot"></div>
+            🛢️ AGO · ${statusLabel(s.diesel)}
+          </div>
+        </div>
+        <div class="station-meta">
+          <div class="queue-badge ${queueClass(s.queue)}">${queueLabel(s.queue)}</div>
+          <span>${s.reports} report${s.reports !== 1 ? 's' : ''} · ${timeLabel(s.minutesAgo)}</span>
+          <button class="report-btn" onclick="openReport(${s.id}, '${s.name.replace(/'/g,"\\'")}'); event.stopPropagation()">Report</button>
+        </div>
+      </div>`;
+  });
+
+  list.innerHTML = html;
+}
+
+// ── Report Modal ───────────────────────────────────────
+function openReport(stationId, name) {
+  reportTarget = stationId;
+  reportSelections = { petrol: null, diesel: null, queue: null };
+  document.getElementById('modalStationName').textContent = name || 'Report Fuel Status';
+  document.querySelectorAll('#petrolOptions .status-option, #dieselOptions .status-option').forEach(el => {
+    el.className = 'status-option';
+  });
+  document.querySelectorAll('.queue-opt').forEach(el => el.classList.remove('selected'));
+  document.getElementById('reportModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('reportModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('reportModal')) closeModal();
+}
+
+function selectStatus(fuel, status, el) {
+  const container = document.getElementById(fuel === 'petrol' ? 'petrolOptions' : 'dieselOptions');
+  container.querySelectorAll('.status-option').forEach(opt => { opt.className = 'status-option'; });
+  el.classList.add('selected-' + status);
+  reportSelections[fuel] = status;
+}
+
+function selectQueue(queue, el) {
+  document.querySelectorAll('.queue-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  reportSelections.queue = queue;
+}
+
+function submitReport() {
+  if (!reportSelections.petrol && !reportSelections.diesel) {
+    showToast('⚠️ Please select at least one fuel status');
+    return;
+  }
+
+  if (reportTarget !== null) {
+    const station = allStations.find(s => s.id === reportTarget);
+    if (station) {
+      if (reportSelections.petrol) station.petrol = reportSelections.petrol;
+      if (reportSelections.diesel) station.diesel = reportSelections.diesel;
+      if (reportSelections.queue) station.queue = reportSelections.queue;
+      station.minutesAgo = 0;
+      station.reports += 1;
+    }
+  }
+
+  closeModal();
+  renderStats();
+  applyFilters();
+  showToast('✅ Report submitted! Thank you for helping others.');
+}
+
+// ── Location Detection ─────────────────────────────────
+function detectLocation() {
+  if (!navigator.geolocation) {
+    showToast('📍 Geolocation not supported on this device');
+    return;
+  }
+  showToast('📍 Detecting your location…');
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const state = guessStateFromCoords(pos.coords.latitude, pos.coords.longitude);
+      if (state) {
+        document.getElementById('stateSelect').value = state;
+        loadState(state);
+        showToast(`📍 Detected: ${state}`);
+      } else {
+        showToast('📍 Could not determine your state. Please select manually.');
+      }
+    },
+    () => showToast('📍 Location access denied. Please select your state.')
+  );
+}
+
+function guessStateFromCoords(lat, lng) {
+  // Rough bounding boxes for Nigerian states
+  const bounds = [
+    { state: 'Lagos', latMin: 6.35, latMax: 6.7, lngMin: 3.1, lngMax: 3.7 },
+    { state: 'FCT – Abuja', latMin: 8.8, latMax: 9.2, lngMin: 7.0, lngMax: 7.6 },
+    { state: 'Kano', latMin: 11.8, latMax: 12.3, lngMin: 8.3, lngMax: 8.8 },
+    { state: 'Rivers', latMin: 4.6, latMax: 5.2, lngMin: 6.8, lngMax: 7.5 },
+    { state: 'Oyo', latMin: 7.1, latMax: 8.1, lngMin: 3.5, lngMax: 4.5 },
+    { state: 'Anambra', latMin: 5.9, latMax: 6.5, lngMin: 6.7, lngMax: 7.1 },
+    { state: 'Delta', latMin: 5.0, latMax: 6.2, lngMin: 5.6, lngMax: 6.9 },
+    { state: 'Edo', latMin: 6.0, latMax: 7.2, lngMin: 5.1, lngMax: 6.4 },
+    { state: 'Kaduna', latMin: 10.1, latMax: 10.7, lngMin: 7.4, lngMax: 7.8 },
+    { state: 'Enugu', latMin: 6.1, latMax: 6.9, lngMin: 7.1, lngMax: 7.7 },
+    { state: 'Borno', latMin: 11.4, latMax: 12.4, lngMin: 13.0, lngMax: 14.7 },
+    { state: 'Sokoto', latMin: 12.6, latMax: 13.2, lngMin: 4.9, lngMax: 5.7 },
+  ];
+  const match = bounds.find(b => lat >= b.latMin && lat <= b.latMax && lng >= b.lngMin && lng <= b.lngMax);
+  return match ? match.state : null;
+}
+
+// ── Install ────────────────────────────────────────────
+function installApp() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(result => {
+      if (result.outcome === 'accepted') showToast('✅ Installing FuelNow…');
+      deferredInstallPrompt = null;
+      document.getElementById('installBtn').classList.remove('visible');
+    });
+  } else {
+    showToast('ℹ️ To install: tap Share → Add to Home Screen (iOS) or use browser menu → Install');
+  }
+}
+
+// ── Ad Click ──────────────────────────────────────────
+function adClick(advertiser) {
+  showToast(`Opening ${advertiser}…`);
+}
+
+// ── Toast ──────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
