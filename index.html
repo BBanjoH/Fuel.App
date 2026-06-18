@@ -534,6 +534,63 @@ select {
 .audit-time  { margin-left: auto; color: var(--gray-400); white-space: nowrap; font-size: 11px; }
 .admin-empty { text-align: center; padding: 32px; color: var(--gray-400); font-size: 13px; }
 
+/* ══ FUEL PRICE GRID (station cards) ══════════════════════════ */
+.fuel-price-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+.fuel-price-grid.has-extra { grid-template-columns:repeat(4,1fr); }
+@media (max-width:400px) { .fuel-price-grid.has-extra { grid-template-columns:1fr 1fr; } }
+.fpc { border-radius:var(--radius-sm); padding:10px 10px 8px; display:flex; flex-direction:column; }
+.fpc-available   { background:var(--available-bg); }
+.fpc-limited     { background:var(--limited-bg); }
+.fpc-unavailable { background:var(--unavailable-bg); }
+.fpc-na          { background:var(--gray-100); }
+.fpc-top { display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; margin-bottom:4px; }
+.fpc-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.fpc-available   .fpc-dot  { background:var(--available); }
+.fpc-limited     .fpc-dot  { background:var(--limited); }
+.fpc-unavailable .fpc-dot  { background:var(--unavailable); }
+.fpc-na          .fpc-dot  { background:var(--gray-400); }
+.fpc-available   .fpc-top  { color:var(--available); }
+.fpc-limited     .fpc-top  { color:var(--limited); }
+.fpc-unavailable .fpc-top  { color:var(--unavailable); }
+.fpc-na          .fpc-top  { color:var(--gray-400); }
+.fpc-price { font-size:19px; font-weight:800; line-height:1.1; }
+.fpc-available   .fpc-price { color:var(--available); }
+.fpc-limited     .fpc-price { color:var(--limited); }
+.fpc-unavailable .fpc-price { color:var(--unavailable); }
+.fpc-na          .fpc-price { color:var(--gray-400); font-size:13px; }
+.fpc-unit { font-size:10px; color:var(--gray-400); margin-top:2px; }
+
+/* ══ MARKET PRICE REFERENCE BAR ══════════════════════════════ */
+.market-prices-bar {
+  background:linear-gradient(135deg,#0f3460 0%,#16213e 100%);
+  border-radius:var(--radius); padding:14px 14px 10px; margin-bottom:14px;
+  color:white; box-shadow:var(--shadow-lg); display:none;
+}
+.mpb-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.mpb-title  { font-size:11px; font-weight:700; opacity:0.8; text-transform:uppercase; letter-spacing:0.5px; }
+.mpb-live   { font-size:10px; background:rgba(74,222,128,0.2); color:#4ade80; border-radius:20px; padding:3px 8px; font-weight:700; display:flex; align-items:center; gap:4px; }
+.mpb-live-dot { width:6px; height:6px; border-radius:50%; background:#4ade80; animation:pulse-dot 1.5s infinite; }
+.mpb-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:8px; }
+@media (max-width:380px) { .mpb-grid { grid-template-columns:1fr 1fr; } }
+.mpb-item  { text-align:center; background:rgba(255,255,255,0.08); border-radius:var(--radius-sm); padding:8px 4px; }
+.mpb-icon  { font-size:16px; margin-bottom:2px; display:block; }
+.mpb-fuel  { font-size:9px; opacity:0.7; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; display:block; }
+.mpb-price { font-size:14px; font-weight:800; margin-top:3px; display:block; }
+.mpb-sub   { font-size:10px; opacity:0.5; text-align:center; }
+
+/* ══ PRICE INPUT GRID (modals) ════════════════════════════════ */
+.price-inputs-section { margin-bottom:16px; }
+.price-inputs-lbl { font-size:12px; font-weight:700; color:var(--gray-600); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; display:block; }
+.price-input-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.price-input-wrap label { font-size:11px; font-weight:700; color:var(--gray-600); display:block; margin-bottom:4px; }
+.price-input-wrap input {
+  width:100%; padding:9px 10px; border-radius:var(--radius-sm);
+  border:1.5px solid var(--gray-200); font-size:14px; font-weight:700;
+  color:var(--gray-800); outline:none; transition:border-color 0.2s; font-family:inherit; background:white;
+}
+.price-input-wrap input:focus { border-color:var(--green); }
+.price-input-wrap input::placeholder { font-weight:400; color:var(--gray-400); }
+
 /* ══ PENDING / CLAIM / MANAGED BADGES ON CARDS ═══════════════ */
 .managed-badge { background: #ede9fe; color: #5b21b6; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
 .claim-btn {
@@ -624,6 +681,21 @@ select {
     <!-- Stats -->
     <div class="stats-bar" id="statsBar"></div>
 
+    <!-- Market Price Reference Bar -->
+    <div class="market-prices-bar" id="marketPricesBar">
+      <div class="mpb-header">
+        <span class="mpb-title">📊 Current Pump Prices — Nigeria</span>
+        <span class="mpb-live"><span class="mpb-live-dot"></span>LIVE</span>
+      </div>
+      <div class="mpb-grid">
+        <div class="mpb-item"><span class="mpb-icon">⛽</span><span class="mpb-fuel">Petrol</span><span class="mpb-price" id="mpb_petrol">—</span></div>
+        <div class="mpb-item"><span class="mpb-icon">🛢️</span><span class="mpb-fuel">Diesel</span><span class="mpb-price" id="mpb_diesel">—</span></div>
+        <div class="mpb-item"><span class="mpb-icon">🔵</span><span class="mpb-fuel">Kerosene</span><span class="mpb-price" id="mpb_kerosene">—</span></div>
+        <div class="mpb-item"><span class="mpb-icon">🟡</span><span class="mpb-fuel">LPG Gas</span><span class="mpb-price" id="mpb_gas">—</span></div>
+      </div>
+      <div class="mpb-sub">Market reference prices · Per-station prices shown on each card</div>
+    </div>
+
     <!-- AD SLOT: results-top (banner) -->
     <div id="ad-slot-results-top"></div>
 
@@ -707,6 +779,27 @@ select {
         <div class="queue-opt" onclick="selectQueue('long',this)">Long (&gt;30 cars)</div>
       </div>
     </div>
+    <div class="price-inputs-section">
+      <span class="price-inputs-lbl">💰 Current Prices (₦) — optional but helpful</span>
+      <div class="price-input-grid">
+        <div class="price-input-wrap">
+          <label>⛽ Petrol / litre</label>
+          <input id="rep_petrolPrice" type="number" min="0" placeholder="e.g. 935">
+        </div>
+        <div class="price-input-wrap">
+          <label>🛢️ Diesel / litre</label>
+          <input id="rep_dieselPrice" type="number" min="0" placeholder="e.g. 1200">
+        </div>
+        <div class="price-input-wrap">
+          <label>🔵 Kerosene / litre</label>
+          <input id="rep_keroPrice" type="number" min="0" placeholder="e.g. 900">
+        </div>
+        <div class="price-input-wrap">
+          <label>🟡 Gas (LPG) / kg</label>
+          <input id="rep_gasPrice" type="number" min="0" placeholder="e.g. 1400">
+        </div>
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('reportModal')">Cancel</button>
       <button class="btn-submit" onclick="submitReport()">✅ Submit Report</button>
@@ -774,6 +867,28 @@ select {
         <div class="queue-opt" onclick="selectQueue('short',this,'add')">Short</div>
         <div class="queue-opt" onclick="selectQueue('medium',this,'add')">Medium</div>
         <div class="queue-opt" onclick="selectQueue('long',this,'add')">Long</div>
+      </div>
+    </div>
+
+    <div class="price-inputs-section">
+      <span class="price-inputs-lbl">💰 Current Fuel Prices (₦) — optional</span>
+      <div class="price-input-grid">
+        <div class="price-input-wrap">
+          <label>⛽ Petrol / litre</label>
+          <input id="add_petrolPrice" type="number" min="0" placeholder="e.g. 935">
+        </div>
+        <div class="price-input-wrap">
+          <label>🛢️ Diesel / litre</label>
+          <input id="add_dieselPrice" type="number" min="0" placeholder="e.g. 1200">
+        </div>
+        <div class="price-input-wrap">
+          <label>🔵 Kerosene / litre</label>
+          <input id="add_keroPrice" type="number" min="0" placeholder="e.g. 900">
+        </div>
+        <div class="price-input-wrap">
+          <label>🟡 Gas (LPG) / kg</label>
+          <input id="add_gasPrice" type="number" min="0" placeholder="e.g. 1400">
+        </div>
       </div>
     </div>
 
@@ -1136,9 +1251,27 @@ select {
         <input class="form-input" id="edit_hours" placeholder="e.g. 7am–9pm">
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Petrol Price (₦/litre)</label>
-      <input class="form-input" id="edit_petrolPrice" type="number" placeholder="e.g. 650">
+
+    <div class="price-inputs-section">
+      <span class="price-inputs-lbl">💰 Live Fuel Prices (₦)</span>
+      <div class="price-input-grid">
+        <div class="price-input-wrap">
+          <label>⛽ Petrol / litre</label>
+          <input id="edit_petrolPrice" type="number" min="0" placeholder="e.g. 935">
+        </div>
+        <div class="price-input-wrap">
+          <label>🛢️ Diesel / litre</label>
+          <input id="edit_dieselPrice" type="number" min="0" placeholder="e.g. 1200">
+        </div>
+        <div class="price-input-wrap">
+          <label>🔵 Kerosene / litre</label>
+          <input id="edit_keroPrice" type="number" min="0" placeholder="e.g. 900">
+        </div>
+        <div class="price-input-wrap">
+          <label>🟡 Gas (LPG) / kg</label>
+          <input id="edit_gasPrice" type="number" min="0" placeholder="e.g. 1400">
+        </div>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('editStationModal')">Cancel</button>
@@ -1624,6 +1757,7 @@ function renderStats() {
     <div class="stat-card"><div class="stat-num green">${avail}</div><div class="stat-label">Has Fuel</div></div>
     <div class="stat-card"><div class="stat-num orange">${lim}</div><div class="stat-label">Limited</div></div>
     <div class="stat-card"><div class="stat-num red">${none}</div><div class="stat-label">No Fuel</div></div>`;
+  renderMarketPricesBar();
 }
 
 function renderStations() {
@@ -1675,6 +1809,12 @@ function renderStations() {
     const qLabelD = queueDisplay === 'none' ? '🟢 No Queue' : queueDisplay === 'short' ? '🟡 Short Queue'
       : queueDisplay === 'medium' ? '🟠 Medium Queue' : '🔴 Long Queue';
 
+    const petrolPrice = displayMeta.petrolPrice || s.petrolPrice || '';
+    const dieselPrice = displayMeta.dieselPrice || s.dieselPrice || '';
+    const keroPrice   = displayMeta.keroPrice   || s.keroPrice   || '';
+    const gasPrice    = displayMeta.gasPrice     || s.gasPrice    || '';
+    const hasExtra = !!(keroPrice || gasPrice);
+
     html += `
       <div class="station-card ${borderClass}" onclick="openReport('${s.id}','${s.name.replace(/'/g,"\\'")}')">
         <div class="station-top">
@@ -1687,9 +1827,11 @@ function renderStations() {
             ${managedBadge}${distBadge}${userBadge}
           </div>
         </div>
-        <div class="fuel-row">
-          <div class="fuel-badge ${petrolDisplay}"><div class="fuel-dot"></div> ⛽ PMS · ${cap(petrolDisplay)}${displayMeta.petrolPrice?' · ₦'+displayMeta.petrolPrice:''}</div>
-          <div class="fuel-badge ${dieselDisplay}"><div class="fuel-dot"></div> 🛢️ AGO · ${cap(dieselDisplay)}</div>
+        <div class="fuel-price-grid${hasExtra?' has-extra':''}">
+          ${fuelCell('⛽','PMS',petrolDisplay,petrolPrice,'/litre')}
+          ${fuelCell('🛢️','AGO',dieselDisplay,dieselPrice,'/litre')}
+          ${keroPrice?fuelCell('🔵','DPK','available',keroPrice,'/litre'):''}
+          ${gasPrice?fuelCell('🟡','LPG Gas','available',gasPrice,'/kg'):''}
         </div>
         <div class="station-meta">
           <div class="queue-badge ${qClassD}">${qLabelD}</div>
@@ -1705,6 +1847,41 @@ function renderStations() {
 }
 
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+function fuelCell(icon, label, statusCls, price, unit) {
+  const fmt = p => p ? `₦${Number(p).toLocaleString('en-NG')}` : cap(statusCls);
+  return `<div class="fpc fpc-${statusCls}">
+    <div class="fpc-top"><div class="fpc-dot"></div>${icon} ${label}</div>
+    <div class="fpc-price">${fmt(price)}</div>
+    ${price ? `<div class="fpc-unit">${unit}</div>` : ''}
+  </div>`;
+}
+
+// ── Market Reference Prices ────────────────────────────────
+const DEFAULT_MARKET_PRICES = { petrol: 935, diesel: 1200, kerosene: 900, gas: 1400 };
+function getMarketPrices() {
+  try { return { ...DEFAULT_MARKET_PRICES, ...JSON.parse(localStorage.getItem('fn_market_prices') || '{}') }; } catch { return DEFAULT_MARKET_PRICES; }
+}
+function setMarketPrices(data) {
+  localStorage.setItem('fn_market_prices', JSON.stringify({ ...getMarketPrices(), ...data }));
+}
+function renderMarketPricesBar() {
+  const bar = document.getElementById('marketPricesBar');
+  if (!bar) return;
+  // Aggregate any station-reported prices and average them; fall back to defaults
+  const mp = getMarketPrices();
+  const allMeta = DB.meta.getAll();
+  ['petrol','diesel','kerosene','gas'].forEach(k => {
+    const key = k === 'gas' ? 'gasPrice' : k === 'kerosene' ? 'keroPrice' : k + 'Price';
+    const vals = Object.values(allMeta).map(m => parseFloat(m[key])).filter(v => v > 0);
+    if (vals.length >= 2) mp[k] = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+  });
+  bar.style.display = '';
+  document.getElementById('mpb_petrol').textContent   = '₦' + Number(mp.petrol).toLocaleString('en-NG')   + '/L';
+  document.getElementById('mpb_diesel').textContent   = '₦' + Number(mp.diesel).toLocaleString('en-NG')   + '/L';
+  document.getElementById('mpb_kerosene').textContent = '₦' + Number(mp.kerosene).toLocaleString('en-NG') + '/L';
+  document.getElementById('mpb_gas').textContent      = '₦' + Number(mp.gas).toLocaleString('en-NG')      + '/kg';
+}
 
 // ── Ad Rendering ───────────────────────────────────────────
 function renderAdHtml(slot) {
@@ -1754,6 +1931,12 @@ function openReport(id, name) {
   document.getElementById('reportStationName').textContent = name;
   document.querySelectorAll('#petrolOptions .status-option, #dieselOptions .status-option').forEach(el => { el.className = 'status-option'; });
   document.querySelectorAll('#reportModal .queue-opt').forEach(el => el.classList.remove('selected'));
+  // Pre-fill prices from existing meta
+  const meta = DB.meta.get(id) || {};
+  document.getElementById('rep_petrolPrice').value = meta.petrolPrice || '';
+  document.getElementById('rep_dieselPrice').value = meta.dieselPrice || '';
+  document.getElementById('rep_keroPrice').value   = meta.keroPrice   || '';
+  document.getElementById('rep_gasPrice').value    = meta.gasPrice    || '';
   openModal('reportModal');
 }
 
@@ -1771,6 +1954,17 @@ function submitReport() {
       saveUserStations(arr);
     }
   }
+  // Save prices to meta (community-reported)
+  const priceUpd = {};
+  const pp = document.getElementById('rep_petrolPrice').value.trim();
+  const dp = document.getElementById('rep_dieselPrice').value.trim();
+  const kp = document.getElementById('rep_keroPrice').value.trim();
+  const gp = document.getElementById('rep_gasPrice').value.trim();
+  if (pp) priceUpd.petrolPrice = pp;
+  if (dp) priceUpd.dieselPrice = dp;
+  if (kp) priceUpd.keroPrice   = kp;
+  if (gp) priceUpd.gasPrice    = gp;
+  if (Object.keys(priceUpd).length) DB.meta.set(reportTargetId, priceUpd);
   closeModal('reportModal');
   renderStats();
   applyFilters();
@@ -1786,7 +1980,7 @@ function openAddStation() {
     return;
   }
   addSelections = { petrol: null, diesel: null, queue: null };
-  ['add_name','add_area','add_address'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['add_name','add_area','add_address','add_petrolPrice','add_dieselPrice','add_keroPrice','add_gasPrice'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   document.getElementById('add_brand').value = '';
   const currentStateSel = currentState || document.getElementById('stateSelect').value;
   document.getElementById('add_state').value = currentStateSel;
@@ -1853,6 +2047,10 @@ function submitAddStation() {
     petrol:    addSelections.petrol || 'available',
     diesel:    addSelections.diesel || 'available',
     queue:     addSelections.queue  || 'none',
+    petrolPrice: document.getElementById('add_petrolPrice').value.trim(),
+    dieselPrice: document.getElementById('add_dieselPrice').value.trim(),
+    keroPrice:   document.getElementById('add_keroPrice').value.trim(),
+    gasPrice:    document.getElementById('add_gasPrice').value.trim(),
     minutesAgo: 0, reports: 1, isUserAdded: true,
     submittedBy: user.id,
     submittedByName: `${user.firstName} ${user.lastName}`,
@@ -2335,6 +2533,13 @@ function approveStation(id) {
   DB.pending.update(id, {status:'approved', reviewedBy:getUser().id, reviewedAt:nowISO()});
   const live = getUserStations(); live.unshift({...s, status:'approved', isUserAdded:true});
   saveUserStations(live);
+  // Persist submitted prices into meta so they show on cards
+  const priceFields = {};
+  if (s.petrolPrice) priceFields.petrolPrice = s.petrolPrice;
+  if (s.dieselPrice) priceFields.dieselPrice = s.dieselPrice;
+  if (s.keroPrice)   priceFields.keroPrice   = s.keroPrice;
+  if (s.gasPrice)    priceFields.gasPrice     = s.gasPrice;
+  if (Object.keys(priceFields).length) DB.meta.set(s.id, priceFields);
   const a = getUser();
   DB.audit.add({id:genId(),action:'STATION_APPROVED',actorId:a.id,actorName:`${a.firstName} ${a.lastName}`,details:`Approved: ${s.name}`,timestamp:nowISO()});
   renderAdminStations(); renderAdminOverview();
@@ -2456,9 +2661,12 @@ function openEditStation(stationId, stationName, event) {
   document.getElementById('edit_stationId').value = stationId;
   document.getElementById('editStationLabel').textContent = stationName;
   const meta = DB.meta.get(stationId)||{};
-  document.getElementById('edit_phone').value       = meta.phone||'';
-  document.getElementById('edit_hours').value       = meta.hours||'';
-  document.getElementById('edit_petrolPrice').value = meta.petrolPrice||'';
+  document.getElementById('edit_phone').value        = meta.phone||'';
+  document.getElementById('edit_hours').value        = meta.hours||'';
+  document.getElementById('edit_petrolPrice').value  = meta.petrolPrice||'';
+  document.getElementById('edit_dieselPrice').value  = meta.dieselPrice||'';
+  document.getElementById('edit_keroPrice').value    = meta.keroPrice||'';
+  document.getElementById('edit_gasPrice').value     = meta.gasPrice||'';
   document.querySelectorAll('#edit_petrolOptions .status-option,#edit_dieselOptions .status-option').forEach(el=>{ el.className='status-option'; });
   document.querySelectorAll('#edit_queueOptions .queue-opt').forEach(el=>el.classList.remove('selected'));
   openModal('editStationModal');
@@ -2471,6 +2679,9 @@ function submitStationEdit() {
     phone:       document.getElementById('edit_phone').value.trim(),
     hours:       document.getElementById('edit_hours').value.trim(),
     petrolPrice: document.getElementById('edit_petrolPrice').value.trim(),
+    dieselPrice: document.getElementById('edit_dieselPrice').value.trim(),
+    keroPrice:   document.getElementById('edit_keroPrice').value.trim(),
+    gasPrice:    document.getElementById('edit_gasPrice').value.trim(),
     lastUpdatedBy: u.id, lastUpdated: nowISO(),
   };
   if (editSel.petrol) upd.petrol = editSel.petrol;
