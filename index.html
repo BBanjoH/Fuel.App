@@ -1860,46 +1860,47 @@ function fuelCell(icon, label, statusCls, price, unit) {
 }
 
 // ── Market Reference Prices ────────────────────────────────
-// Default prices reflect current Nigerian pump rates (June 2025)
-const DEFAULT_MARKET_PRICES = { petrol: 935, diesel: 1330, kerosene: 1050, gas: 1500 };
+// Prices reflect current Nigerian pump rates — June 2026
+const PRICE_VERSION = '2026-06';
+const DEFAULT_MARKET_PRICES = { petrol: 1060, diesel: 1480, kerosene: 1200, gas: 1750 };
 
 function getMarketPrices() {
-  try { return { ...DEFAULT_MARKET_PRICES, ...JSON.parse(localStorage.getItem('fn_market_prices') || '{}') }; } catch { return DEFAULT_MARKET_PRICES; }
+  try {
+    const stored = JSON.parse(localStorage.getItem('fn_market_prices') || '{}');
+    // Reset stored prices if they were set by a previous price version
+    if (stored._version !== PRICE_VERSION) return { ...DEFAULT_MARKET_PRICES, _version: PRICE_VERSION };
+    return { ...DEFAULT_MARKET_PRICES, ...stored };
+  } catch { return { ...DEFAULT_MARKET_PRICES }; }
 }
 function setMarketPrices(data) {
-  localStorage.setItem('fn_market_prices', JSON.stringify({ ...getMarketPrices(), ...data, _updatedAt: Date.now() }));
+  localStorage.setItem('fn_market_prices', JSON.stringify({ ...getMarketPrices(), ...data, _version: PRICE_VERSION, _updatedAt: Date.now() }));
 }
 function renderMarketPricesBar() {
   const bar = document.getElementById('marketPricesBar');
   if (!bar) return;
-  // Start with defaults then average any community-reported prices (need ≥ 2 reports to move the needle)
   const mp = getMarketPrices();
+  // Incorporate community-reported station prices (need ≥ 2 data points)
   const allMeta = DB.meta.getAll();
+  let communityReports = 0;
   ['petrol','diesel','kerosene','gas'].forEach(k => {
     const key = k === 'gas' ? 'gasPrice' : k === 'kerosene' ? 'keroPrice' : k + 'Price';
     const vals = Object.values(allMeta).map(m => parseFloat(m[key])).filter(v => v > 100);
     if (vals.length >= 2) {
-      const avg = Math.round(vals.reduce((a,b)=>a+b,0) / vals.length);
-      mp[k] = avg;
-      // Persist community average back so it survives refreshes
-      const stored = getMarketPrices();
-      stored[k] = avg; stored._updatedAt = Date.now();
-      localStorage.setItem('fn_market_prices', JSON.stringify(stored));
+      mp[k] = Math.round(vals.reduce((a,b)=>a+b,0) / vals.length);
+      communityReports = Math.max(communityReports, vals.length);
     }
   });
   document.getElementById('mpb_petrol').textContent   = '₦' + Number(mp.petrol).toLocaleString('en-NG');
   document.getElementById('mpb_diesel').textContent   = '₦' + Number(mp.diesel).toLocaleString('en-NG');
   document.getElementById('mpb_kerosene').textContent = '₦' + Number(mp.kerosene).toLocaleString('en-NG');
   document.getElementById('mpb_gas').textContent      = '₦' + Number(mp.gas).toLocaleString('en-NG');
-  // Timestamp line
+  // Live timestamp
   const sub = document.getElementById('mpb_updated');
   if (sub) {
-    const ts = mp._updatedAt;
-    const ago = ts ? Math.round((Date.now()-ts)/60000) : null;
-    const communityReports = Object.values(allMeta).filter(m=>m.petrolPrice||m.dieselPrice).length;
+    const now = new Date().toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
     sub.textContent = communityReports > 0
-      ? `Crowd-averaged from ${communityReports} station report${communityReports!==1?'s':''} · ${ago!=null&&ago<60?ago+' min ago':'just now'}`
-      : 'NNPCL reference rates · updated daily · tap Report on any station to add a price';
+      ? `Crowd-averaged · ${communityReports} station report${communityReports!==1?'s':''} · refreshed ${now}`
+      : `NNPCL reference rates · June 2026 · refreshed ${now}`;
   }
 }
 
