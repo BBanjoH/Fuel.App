@@ -1451,6 +1451,10 @@ const NIGERIAN_STATES = Object.keys(STATE_CENTERS).sort();
 
 const BRANDS = ['NNPCL','Ardova','TotalEnergies','MRS','Conoil','Oando','AA Rescue','Ruby','Rainoil','Enyo','Mobil','Heyden'];
 
+// ── Current June 2026 Nigerian pump reference rates ─────────
+const PRICE_VERSION = '2026-06';
+const DEFAULT_MARKET_PRICES = { petrol: 1060, diesel: 1480, kerosene: 1200, gas: 1750 };
+
 const AREAS_BY_STATE = {
   'Lagos':       ['Ikeja','Victoria Island','Lekki','Surulere','Yaba','Apapa','Alimosho','Ikorodu','Agege','Ojodu','Festac','Ajah','Ibeju-Lekki','Mushin','Gbagada','Isolo'],
   'FCT – Abuja': ['Wuse','Garki','Maitama','Asokoro','Gwarinpa','Jabi','Kubwa','Lugbe','Apo','Gudu','Dawaki','Karu','Nyanya'],
@@ -1707,11 +1711,22 @@ function generateStations(state) {
     const qs = (petrol === 'unavailable' && diesel === 'unavailable') ? 'none'
       : ['none','short','medium','long'][Math.floor(rand() * 4)];
 
+    // Generate realistic seeded prices (±9% of market rate, rounded to ₦5)
+    const r5 = (base, rng) => Math.round(base * (0.91 + rng() * 0.18) / 5) * 5;
+    const petrolPrice = r5(DEFAULT_MARKET_PRICES.petrol,  rand);
+    const dieselPrice = r5(DEFAULT_MARKET_PRICES.diesel,  rand);
+    // ~45 % of stations sell kerosene, ~35 % sell LPG gas
+    const sellsKero = rand() < 0.45;
+    const sellsGas  = rand() < 0.35;
+    const keroPrice = sellsKero ? r5(DEFAULT_MARKET_PRICES.kerosene, rand) : '';
+    const gasPrice  = sellsGas  ? r5(DEFAULT_MARKET_PRICES.gas,      rand) : '';
+
     stations.push({
       id: `gen_${state}_${i}`,
       name, brand, area, state,
       address: `${area} Road, ${state}`,
       lat, lng, petrol, diesel, queue: qs,
+      petrolPrice, dieselPrice, keroPrice, gasPrice,
       minutesAgo: Math.floor(rand() * 90) + 5,
       reports: Math.floor(rand() * 24) + 1,
       isUserAdded: false,
@@ -1851,18 +1866,18 @@ function renderStations() {
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 function fuelCell(icon, label, statusCls, price, unit) {
-  const fmt = p => p ? `₦${Number(p).toLocaleString('en-NG')}` : cap(statusCls);
+  const fmt   = p => p ? `₦${Number(p).toLocaleString('en-NG')}` : cap(statusCls);
+  const utext = price
+    ? (statusCls === 'unavailable' ? 'out of stock' : unit)
+    : '';
   return `<div class="fpc fpc-${statusCls}">
     <div class="fpc-top"><div class="fpc-dot"></div>${icon} ${label}</div>
     <div class="fpc-price">${fmt(price)}</div>
-    ${price ? `<div class="fpc-unit">${unit}</div>` : ''}
+    ${utext ? `<div class="fpc-unit">${utext}</div>` : ''}
   </div>`;
 }
 
 // ── Market Reference Prices ────────────────────────────────
-// Prices reflect current Nigerian pump rates — June 2026
-const PRICE_VERSION = '2026-06';
-const DEFAULT_MARKET_PRICES = { petrol: 1060, diesel: 1480, kerosene: 1200, gas: 1750 };
 
 function getMarketPrices() {
   try {
