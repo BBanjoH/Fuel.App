@@ -359,6 +359,203 @@ select {
 /* ── Footer ── */
 .footer { text-align: center; padding: 24px 16px; color: var(--gray-400); font-size: 12px; line-height: 1.7; }
 .footer a { color: var(--green); text-decoration: none; font-weight: 600; }
+
+/* ══ AUTH OVERLAY ══════════════════════════════════════════ */
+.auth-overlay {
+  position: fixed; inset: 0;
+  background: linear-gradient(160deg, var(--green-dark) 0%, var(--green) 60%, var(--green-light) 100%);
+  z-index: 2000; display: none; flex-direction: column;
+  align-items: center; overflow-y: auto;
+  padding: 0 20px calc(32px + env(safe-area-inset-bottom));
+}
+.auth-overlay.open { display: flex; }
+.auth-logo-wrap { text-align: center; padding: 40px 0 28px; color: white; }
+.auth-logo-icon {
+  width: 76px; height: 76px; background: white; border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 42px; margin: 0 auto 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+.auth-logo-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+.auth-logo-sub   { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+.auth-card {
+  background: white; border-radius: 20px; padding: 24px 20px;
+  width: 100%; max-width: 480px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+.auth-tabs-wrap {
+  display: flex; background: var(--gray-100); border-radius: var(--radius-sm);
+  padding: 4px; margin-bottom: 20px;
+}
+.auth-tab-btn {
+  flex: 1; padding: 9px; border: none; background: transparent;
+  border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;
+  color: var(--gray-600); transition: all 0.2s; font-family: inherit;
+}
+.auth-tab-btn.active { background: white; color: var(--green); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.auth-form { display: none; }
+.auth-form.active { display: block; }
+.auth-skip { text-align: center; margin-top: 16px; }
+.auth-skip button {
+  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+  color: white; font-size: 13px; font-weight: 600; cursor: pointer;
+  padding: 9px 20px; border-radius: 20px; font-family: inherit;
+}
+.auth-terms { font-size: 11px; color: var(--gray-400); text-align: center; margin-top: 10px; }
+
+/* ══ PROFILE BUTTON (header) ════════════════════════════════ */
+.btn-profile {
+  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+  color: white; border-radius: 20px; padding: 6px 12px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 5px; transition: background 0.15s;
+}
+.btn-profile:active { background: rgba(255,255,255,0.35); }
+.profile-initial {
+  width: 22px; height: 22px; background: white; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--green-dark); font-weight: 800;
+}
+
+/* ══ PROFILE MODAL ══════════════════════════════════════════ */
+.profile-hero {
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  margin: -20px -20px 16px; padding: 24px 20px;
+  border-radius: var(--radius) var(--radius) 0 0; text-align: center;
+}
+.profile-avatar {
+  width: 68px; height: 68px; background: white; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 800; color: var(--green-dark);
+  margin: 0 auto 10px; border: 3px solid rgba(255,255,255,0.3);
+}
+.profile-fullname  { font-size: 19px; font-weight: 700; color: white; }
+.profile-email-txt { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 3px; }
+.profile-role-chip {
+  display: inline-block; margin-top: 8px;
+  background: rgba(255,255,255,0.2); color: white;
+  padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+}
+.profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.profile-stat { background: var(--gray-100); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+.profile-stat-num   { font-size: 22px; font-weight: 800; color: var(--green); }
+.profile-stat-label { font-size: 11px; color: var(--gray-600); margin-top: 2px; }
+.pmi {
+  display: flex; align-items: center; gap: 12px; padding: 13px 0;
+  border-bottom: 1px solid var(--gray-200); cursor: pointer;
+  font-size: 14px; font-weight: 500; color: var(--gray-800);
+  background: none; border-left: none; border-right: none; border-top: none;
+  width: 100%; text-align: left; font-family: inherit; transition: color 0.15s;
+}
+.pmi:last-child { border-bottom: none; }
+.pmi .pmi-icon    { font-size: 18px; width: 28px; text-align: center; }
+.pmi .pmi-chevron { margin-left: auto; color: var(--gray-400); font-size: 14px; }
+.pmi.danger { color: var(--unavailable); }
+
+/* ══ ADMIN LOGIN GATE ═══════════════════════════════════════ */
+.admin-gate {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.admin-gate.open { display: flex; }
+.admin-gate-box {
+  background: white; border-radius: 20px; padding: 28px 24px;
+  width: 100%; max-width: 380px; box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+}
+.admin-gate-icon  { font-size: 36px; text-align: center; margin-bottom: 12px; }
+.admin-gate-title { font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+.admin-gate-sub   { font-size: 12px; color: var(--gray-600); text-align: center; margin-bottom: 18px; }
+
+/* ══ ADMIN PANEL ════════════════════════════════════════════ */
+.admin-overlay {
+  position: fixed; inset: 0; background: var(--gray-100);
+  z-index: 2000; display: none; flex-direction: column; overflow: hidden;
+}
+.admin-overlay.open { display: flex; }
+.admin-topbar {
+  background: linear-gradient(135deg, #1f2937, #374151); color: white;
+  padding: 14px 16px; padding-top: calc(14px + env(safe-area-inset-top));
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.admin-topbar-title { font-size: 16px; font-weight: 700; flex: 1; }
+.admin-topbar-close {
+  background: rgba(255,255,255,0.15); border: none; color: white;
+  width: 34px; height: 34px; border-radius: 8px; font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.admin-tabs-bar {
+  background: white; border-bottom: 1px solid var(--gray-200);
+  display: flex; gap: 4px; padding: 10px 12px;
+  overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+}
+.admin-tabs-bar::-webkit-scrollbar { display: none; }
+.admin-tab-pill {
+  white-space: nowrap; padding: 7px 14px; border-radius: 20px;
+  border: none; font-size: 13px; font-weight: 600; cursor: pointer;
+  background: var(--gray-100); color: var(--gray-600);
+  font-family: inherit; transition: all 0.15s;
+}
+.admin-tab-pill.active { background: #1f2937; color: white; }
+.admin-body { flex: 1; overflow-y: auto; padding: 16px; }
+.admin-section { display: none; }
+.admin-section.active { display: block; }
+.admin-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.admin-stat-card { background: white; border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); text-align: center; }
+.admin-stat-num   { font-size: 30px; font-weight: 800; }
+.admin-stat-num.green  { color: var(--available); }
+.admin-stat-num.orange { color: var(--limited); }
+.admin-stat-num.blue   { color: #2563eb; }
+.admin-stat-num.purple { color: #7c3aed; }
+.admin-stat-label { font-size: 11px; color: var(--gray-600); margin-top: 2px; }
+.admin-card { background: white; border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
+.admin-card-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+.admin-table-wrap { overflow-x: auto; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 560px; }
+.admin-table th { background: var(--gray-100); padding: 8px 10px; text-align: left; font-weight: 700; color: var(--gray-600); white-space: nowrap; }
+.admin-table td { padding: 10px; border-bottom: 1px solid var(--gray-200); vertical-align: middle; }
+.admin-table tr:last-child td { border-bottom: none; }
+.badge-role { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+.badge-admin    { background: #1e3a5f; color: white; }
+.badge-station_manager { background: #5b21b6; color: white; }
+.badge-user     { background: var(--gray-200); color: var(--gray-600); }
+.badge-pending  { background: var(--limited-bg); color: var(--limited); }
+.badge-approved { background: var(--available-bg); color: var(--available); }
+.badge-rejected { background: var(--unavailable-bg); color: var(--unavailable); }
+.badge-new      { background: #dbeafe; color: #1e40af; }
+.badge-contacted{ background: #ede9fe; color: #5b21b6; }
+.badge-active   { background: var(--available-bg); color: var(--available); }
+.badge-declined { background: var(--unavailable-bg); color: var(--unavailable); }
+.btn-admin { padding: 5px 10px; border-radius: 6px; border: none; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn-approve { background: var(--available); color: white; }
+.btn-reject  { background: var(--unavailable); color: white; }
+.btn-neutral { background: var(--gray-200); color: var(--gray-800); }
+.btn-export  { background: #1f2937; color: white; padding: 7px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; border: none; cursor: pointer; font-family: inherit; }
+.audit-item  { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--gray-200); font-size: 12px; }
+.audit-item:last-child { border-bottom: none; }
+.audit-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; margin-top: 4px; }
+.audit-time  { margin-left: auto; color: var(--gray-400); white-space: nowrap; font-size: 11px; }
+.admin-empty { text-align: center; padding: 32px; color: var(--gray-400); font-size: 13px; }
+
+/* ══ PENDING / CLAIM / MANAGED BADGES ON CARDS ═══════════════ */
+.managed-badge { background: #ede9fe; color: #5b21b6; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+.claim-btn {
+  background: none; border: 1.5px solid var(--gray-200); border-radius: 20px;
+  padding: 4px 10px; font-size: 11px; font-weight: 600; color: var(--green); cursor: pointer;
+}
+.edit-stn-btn {
+  background: none; border: 1.5px solid #7c3aed; border-radius: 20px;
+  padding: 4px 10px; font-size: 11px; font-weight: 600; color: #7c3aed; cursor: pointer;
+}
+.pending-badge { background: var(--limited-bg); color: var(--limited); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+
+/* ══ CLAIM & EDIT STATION MODALS ════════════════════════════ */
+.verify-note {
+  background: var(--available-bg); border-left: 4px solid var(--available);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  font-size: 13px; color: var(--available); margin-bottom: 16px;
+}
+.edit-section-lbl {
+  font-size: 11px; font-weight: 700; color: var(--gray-600);
+  text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 8px;
+}
 </style>
 </head>
 <body>
@@ -366,7 +563,7 @@ select {
 <!-- ══ HEADER ══ -->
 <header class="header">
   <div class="header-top">
-    <div class="logo">
+    <div class="logo" id="logoArea" onclick="logoTap()" style="cursor:pointer">
       <div class="logo-icon">⛽</div>
       <div>
         <div class="logo-title">FuelNow</div>
@@ -375,6 +572,9 @@ select {
     </div>
     <div class="header-actions">
       <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+      <button class="btn-profile" id="profileBtn" onclick="openProfileOrAuth()">
+        <span id="profileBtnInner">🔑 Login</span>
+      </button>
       <button class="btn-install" id="installBtn" onclick="installApp()">📲 Install</button>
     </div>
   </div>
@@ -649,6 +849,305 @@ select {
 <div class="toast" id="toast"></div>
 
 <!-- ══════════════════════════════════════════════════════════
+     AUTH OVERLAY — Registration & Login
+     ══════════════════════════════════════════════════════════ -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-logo-wrap">
+    <div class="auth-logo-icon">⛽</div>
+    <div class="auth-logo-title">FuelNow Nigeria</div>
+    <div class="auth-logo-sub">Your real-time fuel community</div>
+  </div>
+  <div class="auth-card">
+    <div class="auth-tabs-wrap">
+      <button class="auth-tab-btn active" id="authTabRegister" onclick="switchAuthTab('register')">Create Account</button>
+      <button class="auth-tab-btn"        id="authTabLogin"    onclick="switchAuthTab('login')">Sign In</button>
+    </div>
+
+    <!-- ── Register Form ── -->
+    <div class="auth-form active" id="authFormRegister">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name *</label>
+          <input class="form-input" id="reg_firstName" placeholder="e.g. Emeka" autocomplete="given-name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name *</label>
+          <input class="form-input" id="reg_lastName"  placeholder="e.g. Okafor" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address *</label>
+        <input class="form-input" id="reg_email" type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Phone Number *</label>
+          <input class="form-input" id="reg_phone" type="tel" placeholder="080XXXXXXXX" autocomplete="tel">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your State *</label>
+          <select class="form-select" id="reg_state"><option value="">Select state</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <input class="form-input" id="reg_password" type="password" placeholder="At least 6 characters" autocomplete="new-password">
+      </div>
+      <button class="btn-submit" style="width:100%;margin-top:4px" onclick="doRegister()">✅ Create My Account</button>
+      <div class="auth-terms">By registering you agree to help Nigerians find fuel 🇳🇬</div>
+    </div>
+
+    <!-- ── Login Form ── -->
+    <div class="auth-form" id="authFormLogin">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" id="login_email" type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="login_password" type="password" placeholder="Your password" autocomplete="current-password">
+      </div>
+      <button class="btn-submit" style="width:100%;margin-top:4px" onclick="doLogin()">🔑 Sign In</button>
+    </div>
+  </div>
+  <div class="auth-skip">
+    <button onclick="closeAuth()">Browse without an account →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PROFILE MODAL
+     ══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="profileModal" onclick="closeModalOutside(event,'profileModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="profile-hero">
+      <div class="profile-avatar" id="profileAvatar">?</div>
+      <div class="profile-fullname"  id="profileFullname">—</div>
+      <div class="profile-email-txt" id="profileEmailTxt">—</div>
+      <div class="profile-role-chip" id="profileRoleChip">User</div>
+    </div>
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <div class="profile-stat-num"   id="profileSubCount">0</div>
+        <div class="profile-stat-label">Stations Submitted</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-num"   id="profileMgdCount">0</div>
+        <div class="profile-stat-label">Stations Managed</div>
+      </div>
+    </div>
+    <div id="profileMenuItems"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ADMIN LOGIN GATE
+     ══════════════════════════════════════════════════════════ -->
+<div class="admin-gate" id="adminGate">
+  <div class="admin-gate-box">
+    <div class="admin-gate-icon">🔧</div>
+    <div class="admin-gate-title">Admin Access</div>
+    <div class="admin-gate-sub">Enter your admin credentials to continue</div>
+    <div class="form-group">
+      <label class="form-label">Admin Email</label>
+      <input class="form-input" id="adminGateEmail" type="email" placeholder="admin@fuelnow.ng">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" id="adminGatePass" type="password" placeholder="Admin password"
+             onkeydown="if(event.key==='Enter') doAdminLogin()">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" style="flex:1" onclick="closeAdminGate()">Cancel</button>
+      <button class="btn-submit" style="flex:2"  onclick="doAdminLogin()">🔧 Enter Admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ADMIN PANEL OVERLAY
+     ══════════════════════════════════════════════════════════ -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-topbar">
+    <span>🔧</span>
+    <span class="admin-topbar-title">Admin Panel — FuelNow Nigeria</span>
+    <button class="admin-topbar-close" onclick="closeAdmin()">✕</button>
+  </div>
+  <div class="admin-tabs-bar">
+    <button class="admin-tab-pill active" onclick="switchAdminTab('overview',this)">Overview</button>
+    <button class="admin-tab-pill"        onclick="switchAdminTab('users',this)">👤 Users</button>
+    <button class="admin-tab-pill"        onclick="switchAdminTab('stations',this)">⛽ Pending Stations</button>
+    <button class="admin-tab-pill"        onclick="switchAdminTab('claims',this)">🏢 Claims</button>
+    <button class="admin-tab-pill"        onclick="switchAdminTab('ads',this)">📣 Ad Enquiries</button>
+    <button class="admin-tab-pill"        onclick="switchAdminTab('log',this)">📋 Audit Log</button>
+  </div>
+  <div class="admin-body">
+
+    <!-- Overview -->
+    <div class="admin-section active" id="admin-tab-overview">
+      <div class="admin-stat-grid" id="adminOverviewStats"></div>
+      <div class="admin-card">
+        <div class="admin-card-title">Recent Activity</div>
+        <div id="adminRecentLog"></div>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <div class="admin-section" id="admin-tab-users">
+      <div class="admin-card">
+        <div class="admin-card-title">
+          Registered Users
+          <button class="btn-export" onclick="exportUsersCSV()">⬇ Export CSV</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th><th>Email</th><th>Phone</th>
+                <th>State</th><th>Role</th><th>Joined</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Stations -->
+    <div class="admin-section" id="admin-tab-stations">
+      <div class="admin-card">
+        <div class="admin-card-title">Pending Station Submissions</div>
+        <div id="adminPendingList"></div>
+      </div>
+    </div>
+
+    <!-- Claims -->
+    <div class="admin-section" id="admin-tab-claims">
+      <div class="admin-card">
+        <div class="admin-card-title">Station Ownership Claims</div>
+        <div id="adminClaimsList"></div>
+      </div>
+    </div>
+
+    <!-- Ad Enquiries -->
+    <div class="admin-section" id="admin-tab-ads">
+      <div class="admin-card">
+        <div class="admin-card-title">Advertising Enquiries</div>
+        <div id="adminAdsList"></div>
+      </div>
+    </div>
+
+    <!-- Audit Log -->
+    <div class="admin-section" id="admin-tab-log">
+      <div class="admin-card">
+        <div class="admin-card-title">Audit Log (last 100 actions)</div>
+        <div id="adminAuditList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     CLAIM STATION MODAL
+     ══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="claimModal" onclick="closeModalOutside(event,'claimModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🏢 Claim This Station</div>
+    <div class="modal-sub" id="claimStationLabel">Verify you own or manage this filling station</div>
+    <div class="verify-note">
+      ✅ Once an admin approves your claim, you can update this station's live fuel status, prices and hours directly.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Registered Business Name *</label>
+      <input class="form-input" id="claim_business" placeholder="As shown on your CAC certificate">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">CAC / Business Reg. No.</label>
+        <input class="form-input" id="claim_reg" placeholder="RC000000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Manager Phone *</label>
+        <input class="form-input" id="claim_phone" type="tel" placeholder="080XXXXXXXX">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Additional Notes</label>
+      <textarea class="form-textarea" id="claim_notes" style="min-height:60px"
+        placeholder="Any extra info to help us verify your ownership…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('claimModal')">Cancel</button>
+      <button class="btn-submit" onclick="submitClaim()">🏢 Submit Claim</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     EDIT STATION MODAL — for verified station managers
+     ══════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="editStationModal" onclick="closeModalOutside(event,'editStationModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ Update Station Info</div>
+    <div class="modal-sub" id="editStationLabel">—</div>
+    <input type="hidden" id="edit_stationId">
+
+    <div class="edit-section-lbl">Current Fuel Status</div>
+    <div class="fuel-report-grid" style="margin-bottom:14px">
+      <div>
+        <div class="fuel-report-label">⛽ Petrol (PMS)</div>
+        <div class="status-options" id="edit_petrolOptions">
+          <div class="status-option" onclick="selectStatus('edit_petrol','available',this)"><div class="status-dot dot-available"></div> Available</div>
+          <div class="status-option" onclick="selectStatus('edit_petrol','limited',this)"><div class="status-dot dot-limited"></div> Limited</div>
+          <div class="status-option" onclick="selectStatus('edit_petrol','unavailable',this)"><div class="status-dot dot-unavailable"></div> None</div>
+        </div>
+      </div>
+      <div>
+        <div class="fuel-report-label">🛢️ Diesel (AGO)</div>
+        <div class="status-options" id="edit_dieselOptions">
+          <div class="status-option" onclick="selectStatus('edit_diesel','available',this)"><div class="status-dot dot-available"></div> Available</div>
+          <div class="status-option" onclick="selectStatus('edit_diesel','limited',this)"><div class="status-dot dot-limited"></div> Limited</div>
+          <div class="status-option" onclick="selectStatus('edit_diesel','unavailable',this)"><div class="status-dot dot-unavailable"></div> None</div>
+        </div>
+      </div>
+    </div>
+    <div class="queue-section">
+      <div class="queue-label">🚗 Current Queue</div>
+      <div class="queue-options" id="edit_queueOptions">
+        <div class="queue-opt" onclick="selectQueue('none',this,'edit')">No Queue</div>
+        <div class="queue-opt" onclick="selectQueue('short',this,'edit')">Short</div>
+        <div class="queue-opt" onclick="selectQueue('medium',this,'edit')">Medium</div>
+        <div class="queue-opt" onclick="selectQueue('long',this,'edit')">Long</div>
+      </div>
+    </div>
+
+    <div class="edit-section-lbl">Contact &amp; Hours</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Station Phone</label>
+        <input class="form-input" id="edit_phone" placeholder="080XXXXXXXX">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Opening Hours</label>
+        <input class="form-input" id="edit_hours" placeholder="e.g. 7am–9pm">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Petrol Price (₦/litre)</label>
+      <input class="form-input" id="edit_petrolPrice" type="number" placeholder="e.g. 650">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('editStationModal')">Cancel</button>
+      <button class="btn-submit" onclick="submitStationEdit()">✅ Save Updates</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
      AD MANAGEMENT GUIDE
      ══════════════════════════════════════════════════════════
 
@@ -848,11 +1347,13 @@ let currentState = '';
 
 // ── Init ───────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+  initAdmin();          // seed default admin account
   populateSelects();
   updateTimestamp();
   setInterval(updateTimestamp, 60000);
   registerSW();
   renderAllAdSlots();
+  updateHeaderUI();     // show profile button state
 
   const saved = localStorage.getItem('fuelnow_state');
   if (saved && STATE_CENTERS[saved]) {
@@ -876,13 +1377,15 @@ function registerSW() {
 }
 
 function populateSelects() {
-  const stateSel = document.getElementById('stateSelect');
+  const stateSel    = document.getElementById('stateSelect');
   const addStateSel = document.getElementById('add_state');
   const addBrandSel = document.getElementById('add_brand');
+  const regStateSel = document.getElementById('reg_state');
 
   NIGERIAN_STATES.forEach(s => {
     stateSel.insertAdjacentHTML('beforeend', `<option value="${s}">${s}</option>`);
     addStateSel.insertAdjacentHTML('beforeend', `<option value="${s}">${s}</option>`);
+    regStateSel.insertAdjacentHTML('beforeend', `<option value="${s}">${s}</option>`);
   });
   BRANDS.forEach(b => {
     addBrandSel.insertAdjacentHTML('beforeend', `<option value="${b}">${b}</option>`);
@@ -1149,28 +1652,51 @@ function renderStations() {
     const userBadge = s.isUserAdded ? `<div class="user-badge">You added</div>` : '';
     const deleteBtn = s.isUserAdded ? `<button class="delete-btn" onclick="deleteStation('${s.id}',event)" title="Delete station">🗑</button>` : '';
 
+    // Ownership / claim badges
+    const cu   = getUser();
+    const meta = DB.meta.get(s.id);
+    const isOwned    = !!(meta && meta.ownerId);
+    const isMyStation= !!(cu && meta && meta.ownerId === cu.id);
+    const canEdit    = isMyStation || isAdmin(cu);
+    const canClaim   = !!(cu && !isOwned && !s.isUserAdded);
+    const managedBadge = isOwned ? `<div class="managed-badge">🏢 Managed</div>` : '';
+    const claimEditBtn = canEdit
+      ? `<button class="edit-stn-btn" onclick="openEditStation('${s.id}','${s.name.replace(/'/g,"\\'")}',event)">✏️ Edit</button>`
+      : canClaim
+        ? `<button class="claim-btn" onclick="openClaim('${s.id}','${s.name.replace(/'/g,"\\'")}',event)">Claim</button>`
+        : '';
+
+    // Meta overrides (station manager updates)
+    const displayMeta = meta || {};
+    const petrolDisplay = displayMeta.petrol || s.petrol;
+    const dieselDisplay = displayMeta.diesel || s.diesel;
+    const queueDisplay  = displayMeta.queue  || s.queue;
+    const qClassD = queueDisplay === 'long' ? 'long' : queueDisplay === 'medium' ? 'medium' : 'short';
+    const qLabelD = queueDisplay === 'none' ? '🟢 No Queue' : queueDisplay === 'short' ? '🟡 Short Queue'
+      : queueDisplay === 'medium' ? '🟠 Medium Queue' : '🔴 Long Queue';
+
     html += `
       <div class="station-card ${borderClass}" onclick="openReport('${s.id}','${s.name.replace(/'/g,"\\'")}')">
         <div class="station-top">
           <div class="station-info">
             <div class="station-name">${s.name}</div>
-            <div class="station-address">📍 ${s.address}</div>
+            <div class="station-address">📍 ${s.address}${displayMeta.hours?' · ⏰ '+displayMeta.hours:''}</div>
           </div>
           <div class="station-badges">
             <div class="station-brand">${s.brand}</div>
-            ${distBadge}${userBadge}
+            ${managedBadge}${distBadge}${userBadge}
           </div>
         </div>
         <div class="fuel-row">
-          <div class="fuel-badge ${s.petrol}"><div class="fuel-dot"></div> ⛽ PMS · ${cap(s.petrol)}</div>
-          <div class="fuel-badge ${s.diesel}"><div class="fuel-dot"></div> 🛢️ AGO · ${cap(s.diesel)}</div>
+          <div class="fuel-badge ${petrolDisplay}"><div class="fuel-dot"></div> ⛽ PMS · ${cap(petrolDisplay)}${displayMeta.petrolPrice?' · ₦'+displayMeta.petrolPrice:''}</div>
+          <div class="fuel-badge ${dieselDisplay}"><div class="fuel-dot"></div> 🛢️ AGO · ${cap(dieselDisplay)}</div>
         </div>
         <div class="station-meta">
-          <div class="queue-badge ${qClass}">${qLabel}</div>
+          <div class="queue-badge ${qClassD}">${qLabelD}</div>
           <div class="meta-right">
             <span>${s.reports} report${s.reports !== 1 ? 's' : ''} · ${timeStr}</span>
             <button class="report-btn" onclick="openReport('${s.id}','${s.name.replace(/'/g,"\\'")}');event.stopPropagation()">Report</button>
-            ${deleteBtn}
+            ${claimEditBtn}${deleteBtn}
           </div>
         </div>
       </div>`;
@@ -1253,6 +1779,12 @@ function submitReport() {
 
 // ── Add Station Modal ──────────────────────────────────────
 function openAddStation() {
+  if (!isLoggedIn()) {
+    pendingAction = openAddStation;
+    openAuth('register');
+    showToast('ℹ️ Please create an account to add a station');
+    return;
+  }
   addSelections = { petrol: null, diesel: null, queue: null };
   ['add_name','add_area','add_address'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   document.getElementById('add_brand').value = '';
@@ -1260,10 +1792,31 @@ function openAddStation() {
   document.getElementById('add_state').value = currentStateSel;
   document.querySelectorAll('#add_petrolOptions .status-option, #add_dieselOptions .status-option').forEach(el => { el.className = 'status-option'; });
   document.querySelectorAll('#add_queueOptions .queue-opt').forEach(el => el.classList.remove('selected'));
+
+  // Update modal subtitle to show pending-review note
+  const sub = document.querySelector('#addStationModal .modal-sub');
+  if (sub) sub.textContent = 'Your submission will be reviewed by an admin before appearing on the map.';
   openModal('addStationModal');
 }
 
 function submitAddStation() {
+  // Require login
+  if (!isLoggedIn()) {
+    closeModal('addStationModal');
+    pendingAction = openAddStation;
+    openAuth('register');
+    return;
+  }
+
+  const user  = getUser();
+  const today = new Date().toISOString().slice(0,10);
+  const fresh = DB.users.find(user.id);
+
+  // Rate limiting: max 3 submissions per day
+  if (fresh && fresh.submissionDate === today && (fresh.submissionsToday||0) >= 3) {
+    showToast('⚠️ Daily limit: max 3 station submissions per day'); return;
+  }
+
   const name  = document.getElementById('add_name').value.trim();
   const brand = document.getElementById('add_brand').value;
   const state = document.getElementById('add_state').value;
@@ -1275,34 +1828,49 @@ function submitAddStation() {
   if (!state) { showToast('⚠️ Please select a state'); return; }
   if (!area)  { showToast('⚠️ Area / neighbourhood is required'); return; }
 
+  // Basic spam check
+  if (/^(test|aaa|bbb|xxx|asdf|qwerty)/i.test(name)) {
+    showToast('⚠️ Please enter a real station name'); return;
+  }
+
   const center = STATE_CENTERS[state] || [9.07, 7.40];
-  const newStation = {
-    id: `user_${Date.now()}`,
+  const lat = userLat !== null ? userLat + (Math.random()-0.5)*0.005 : center[0] + (Math.random()-0.5)*0.1;
+  const lng = userLng !== null ? userLng + (Math.random()-0.5)*0.005 : center[1] + (Math.random()-0.5)*0.1;
+
+  // Duplicate detection: same brand within ~0.3 km
+  const existing = [...getUserStations(), ...generateStations(state)];
+  const tooClose = existing.find(s => haversine(lat,lng,s.lat,s.lng) < 0.3 && (s.brand||'').toLowerCase() === brand.toLowerCase());
+  if (tooClose) {
+    showToast(`⚠️ A similar ${brand} station may already exist nearby. Please verify.`);
+    return;
+  }
+
+  const pending = {
+    id: `pending_${genId()}`,
     name, brand, state, area,
     address: addr || `${area}, ${state}`,
-    lat: center[0] + (Math.random() - 0.5) * 0.1,
-    lng: center[1] + (Math.random() - 0.5) * 0.1,
+    lat, lng,
     petrol:    addSelections.petrol || 'available',
     diesel:    addSelections.diesel || 'available',
     queue:     addSelections.queue  || 'none',
-    minutesAgo: 0,
-    reports: 1,
-    isUserAdded: true,
+    minutesAgo: 0, reports: 1, isUserAdded: true,
+    submittedBy: user.id,
+    submittedByName: `${user.firstName} ${user.lastName}`,
+    submittedAt: nowISO(),
+    status: 'pending',
+    reviewedBy: null, reviewedAt: null, rejectionReason: null,
   };
 
-  const arr = getUserStations();
-  arr.unshift(newStation);
-  saveUserStations(arr);
+  DB.pending.add(pending);
+
+  // Update daily submission count
+  const newCount = (fresh && fresh.submissionDate===today) ? (fresh.submissionsToday||0)+1 : 1;
+  DB.users.update(user.id, {submissionsToday: newCount, submissionDate: today});
+
+  DB.audit.add({id:genId(),action:'STATION_SUBMITTED',actorId:user.id,actorName:`${user.firstName} ${user.lastName}`,details:`Submitted: ${name} (${area}, ${state})`,timestamp:nowISO()});
 
   closeModal('addStationModal');
-  showToast(`✅ "${name}" saved successfully!`);
-
-  if (currentMode === 'nearby' && userLat !== null) {
-    loadNearbyStations();
-  } else if (state === currentState || currentState === '') {
-    loadState(state);
-    document.getElementById('stateSelect').value = state;
-  }
+  showToast(`⏳ "${name}" submitted for admin review. We'll verify and publish it soon!`);
 }
 
 function deleteStation(id, event) {
@@ -1351,28 +1919,45 @@ function submitAdvertise() {
     `--- Sent via FuelNow Nigeria App ---`,
   ].join('\n');
 
+  // Save enquiry to admin dashboard
+  DB.enquiries.add({
+    id: genId(), name, company: company||'', phone, email: email||'',
+    budget: selectedBudget||'Not specified', placement,
+    message: message||'', status: 'new', submittedAt: nowISO(),
+  });
+  DB.audit.add({id:genId(),action:'AD_ENQUIRY',actorId:'public',actorName:name,details:`Ad enquiry from ${phone}`,timestamp:nowISO()});
+
   const mailtoUrl = `mailto:henrryking90@gmail.com?subject=${encodeURIComponent('FuelNow Advertising Enquiry — ' + name)}&body=${encodeURIComponent(body)}`;
   window.open(mailtoUrl, '_blank');
   closeModal('advertiseModal');
-  showToast('✅ Opening your email app…');
+  showToast('✅ Enquiry saved & email app opening…');
 }
 
-// ── Status / Queue selection (shared) ─────────────────────
+// ── Status / Queue selection (shared by report, add & edit modals) ─
 function selectStatus(fuel, status, el) {
-  const prefixes = { petrol:'petrolOptions', diesel:'dieselOptions', add_petrol:'add_petrolOptions', add_diesel:'add_dieselOptions' };
+  const prefixes = {
+    petrol:'petrolOptions', diesel:'dieselOptions',
+    add_petrol:'add_petrolOptions', add_diesel:'add_dieselOptions',
+    edit_petrol:'edit_petrolOptions', edit_diesel:'edit_dieselOptions',
+  };
   const container = document.getElementById(prefixes[fuel]);
   if (container) container.querySelectorAll('.status-option').forEach(o => { o.className = 'status-option'; });
   el.classList.add('selected-' + status);
-  if (fuel === 'add_petrol') addSelections.petrol = status;
-  else if (fuel === 'add_diesel') addSelections.diesel = status;
+  if      (fuel === 'add_petrol')  addSelections.petrol  = status;
+  else if (fuel === 'add_diesel')  addSelections.diesel  = status;
+  else if (fuel === 'edit_petrol') editSel.petrol        = status;
+  else if (fuel === 'edit_diesel') editSel.diesel        = status;
   else reportSelections[fuel] = status;
 }
 
 function selectQueue(queue, el, ctx) {
-  const container = ctx === 'add' ? document.getElementById('add_queueOptions') : el.parentElement;
+  const container = ctx === 'add'  ? document.getElementById('add_queueOptions')
+                  : ctx === 'edit' ? document.getElementById('edit_queueOptions')
+                  : el.parentElement;
   container.querySelectorAll('.queue-opt').forEach(o => o.classList.remove('selected'));
   el.classList.add('selected');
-  if (ctx === 'add') addSelections.queue = queue;
+  if      (ctx === 'add')  addSelections.queue = queue;
+  else if (ctx === 'edit') editSel.queue       = queue;
   else reportSelections.queue = queue;
 }
 
@@ -1387,6 +1972,524 @@ function closeModal(id) {
 }
 function closeModalOutside(e, id) {
   if (e.target === document.getElementById(id)) closeModal(id);
+}
+
+// ════════════════════════════════════════════════════════════
+//  DATABASE LAYER  (localStorage — swap to API calls later)
+// ════════════════════════════════════════════════════════════
+const DB = {
+  users: {
+    getAll:      ()      => { try { return JSON.parse(localStorage.getItem('fn_users')||'[]'); } catch{ return []; } },
+    save:        (a)     => localStorage.setItem('fn_users', JSON.stringify(a)),
+    find:        (id)    => DB.users.getAll().find(u => u.id === id) || null,
+    findByEmail: (em)    => DB.users.getAll().find(u => u.email === em.toLowerCase()) || null,
+    add:         (u)     => { const a = DB.users.getAll(); a.push(u); DB.users.save(a); },
+    update:      (id, d) => DB.users.save(DB.users.getAll().map(u => u.id === id ? {...u,...d} : u)),
+  },
+  pending: {
+    getAll:  ()      => { try { return JSON.parse(localStorage.getItem('fn_pending')||'[]'); } catch{ return []; } },
+    save:    (a)     => localStorage.setItem('fn_pending', JSON.stringify(a)),
+    add:     (s)     => { const a = DB.pending.getAll(); a.unshift(s); DB.pending.save(a); },
+    update:  (id, d) => DB.pending.save(DB.pending.getAll().map(s => s.id === id ? {...s,...d} : s)),
+  },
+  claims: {
+    getAll:  ()      => { try { return JSON.parse(localStorage.getItem('fn_claims')||'[]'); } catch{ return []; } },
+    save:    (a)     => localStorage.setItem('fn_claims', JSON.stringify(a)),
+    add:     (c)     => { const a = DB.claims.getAll(); a.unshift(c); DB.claims.save(a); },
+    update:  (id, d) => DB.claims.save(DB.claims.getAll().map(c => c.id === id ? {...c,...d} : c)),
+  },
+  enquiries: {
+    getAll:  ()      => { try { return JSON.parse(localStorage.getItem('fn_enquiries')||'[]'); } catch{ return []; } },
+    save:    (a)     => localStorage.setItem('fn_enquiries', JSON.stringify(a)),
+    add:     (e)     => { const a = DB.enquiries.getAll(); a.unshift(e); DB.enquiries.save(a); },
+    update:  (id, d) => DB.enquiries.save(DB.enquiries.getAll().map(e => e.id === id ? {...e,...d} : e)),
+  },
+  audit: {
+    getAll: () => { try { return JSON.parse(localStorage.getItem('fn_audit')||'[]'); } catch{ return []; } },
+    add:    (entry) => {
+      const a = DB.audit.getAll(); a.unshift(entry);
+      if (a.length > 200) a.splice(200);
+      localStorage.setItem('fn_audit', JSON.stringify(a));
+    },
+  },
+  session: {
+    get:   ()  => { try { return JSON.parse(localStorage.getItem('fn_session')||'null'); } catch{ return null; } },
+    set:   (u) => localStorage.setItem('fn_session', JSON.stringify(u)),
+    clear: ()  => localStorage.removeItem('fn_session'),
+  },
+  meta: {
+    getAll: ()       => { try { return JSON.parse(localStorage.getItem('fn_meta')||'{}'); } catch{ return {}; } },
+    get:    (id)     => (DB.meta.getAll())[id] || null,
+    set:    (id, d)  => { const all = DB.meta.getAll(); all[id] = {...(all[id]||{}),...d}; localStorage.setItem('fn_meta', JSON.stringify(all)); },
+  },
+};
+
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function simpleHash(s) { let h=5381; for(let i=0;i<s.length;i++) h=((h<<5)+h)^s.charCodeAt(i); return (h>>>0).toString(16); }
+function nowISO() { return new Date().toISOString(); }
+function fmtDate(iso)  { try{ return new Date(iso).toLocaleString('en-NG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }catch{return iso||'—';} }
+function fmtShort(iso) { try{ return new Date(iso).toLocaleDateString('en-NG',{day:'numeric',month:'short'}); }catch{return '—';} }
+
+// ════════════════════════════════════════════════════════════
+//  AUTH MODULE
+// ════════════════════════════════════════════════════════════
+const ADMIN_EMAIL = 'admin@fuelnow.ng';
+const ADMIN_PASS  = 'FuelAdmin2024';
+
+function initAdmin() {
+  if (!DB.users.findByEmail(ADMIN_EMAIL)) {
+    DB.users.add({
+      id:'admin_001', firstName:'Super', lastName:'Admin',
+      email:ADMIN_EMAIL, phone:'+2348000000000', state:'FCT – Abuja',
+      passwordHash: simpleHash(ADMIN_PASS), role:'admin',
+      managedStations:[], submissionsToday:0, submissionDate:'',
+      createdAt:nowISO(), lastLogin:null,
+    });
+  }
+}
+
+function getUser()   { return DB.session.get(); }
+function isLoggedIn(){ return !!getUser(); }
+function isAdmin(u)  { u=u||getUser(); return !!u && u.role==='admin'; }
+function isMgr(u)    { u=u||getUser(); return !!u && (u.role==='station_manager'||u.role==='admin'); }
+
+let pendingAction = null;
+
+function doRegister() {
+  const fn   = document.getElementById('reg_firstName').value.trim();
+  const ln   = document.getElementById('reg_lastName').value.trim();
+  const em   = document.getElementById('reg_email').value.trim().toLowerCase();
+  const ph   = document.getElementById('reg_phone').value.trim();
+  const st   = document.getElementById('reg_state').value;
+  const pw   = document.getElementById('reg_password').value;
+
+  if (!fn||!ln)           { showToast('⚠️ First and last name are required'); return; }
+  if (!em||!/\S+@\S+\.\S+/.test(em)) { showToast('⚠️ Valid email address required'); return; }
+  if (!ph||ph.length<8)   { showToast('⚠️ Valid phone number required'); return; }
+  if (!st)                { showToast('⚠️ Please select your state'); return; }
+  if (!pw||pw.length<6)   { showToast('⚠️ Password must be at least 6 characters'); return; }
+  if (DB.users.findByEmail(em)) { showToast('⚠️ An account with this email already exists'); return; }
+
+  const user = {
+    id:genId(), firstName:fn, lastName:ln, email:em, phone:ph, state:st,
+    passwordHash:simpleHash(pw), role:'user', managedStations:[],
+    submissionsToday:0, submissionDate:'', createdAt:nowISO(), lastLogin:nowISO(),
+  };
+  DB.users.add(user);
+  DB.session.set(user);
+  DB.audit.add({id:genId(),action:'USER_REGISTERED',actorId:user.id,actorName:`${fn} ${ln}`,details:`Registered: ${em}`,timestamp:nowISO()});
+
+  closeAuth();
+  updateHeaderUI();
+  showToast(`✅ Welcome, ${fn}! Account created.`);
+  if (pendingAction) { const act=pendingAction; pendingAction=null; setTimeout(act,300); }
+}
+
+function doLogin() {
+  const em = document.getElementById('login_email').value.trim().toLowerCase();
+  const pw = document.getElementById('login_password').value;
+  if (!em) { showToast('⚠️ Email is required'); return; }
+  if (!pw) { showToast('⚠️ Password is required'); return; }
+
+  const user = DB.users.findByEmail(em);
+  if (!user)                              { showToast('⚠️ No account found with this email'); return; }
+  if (user.passwordHash!==simpleHash(pw)) { showToast('⚠️ Incorrect password'); return; }
+
+  const updated = {...user, lastLogin:nowISO()};
+  DB.users.update(user.id, {lastLogin:nowISO()});
+  DB.session.set(updated);
+
+  closeAuth();
+  updateHeaderUI();
+  showToast(`✅ Welcome back, ${user.firstName}!`);
+  if (isAdmin(updated)) { openAdminPanel(); return; }
+  if (pendingAction) { const act=pendingAction; pendingAction=null; setTimeout(act,300); }
+}
+
+function doAdminLogin() {
+  const em = document.getElementById('adminGateEmail').value.trim().toLowerCase();
+  const pw = document.getElementById('adminGatePass').value;
+  const user = DB.users.findByEmail(em);
+  if (!user||user.role!=='admin'||user.passwordHash!==simpleHash(pw)) {
+    showToast('⚠️ Invalid admin credentials'); return;
+  }
+  const updated = {...user, lastLogin:nowISO()};
+  DB.users.update(user.id, {lastLogin:nowISO()});
+  DB.session.set(updated);
+  closeAdminGate();
+  updateHeaderUI();
+  openAdminPanel();
+}
+
+function authLogout() {
+  const u = getUser();
+  if (u) DB.audit.add({id:genId(),action:'USER_LOGOUT',actorId:u.id,actorName:`${u.firstName} ${u.lastName}`,details:'',timestamp:nowISO()});
+  DB.session.clear();
+  closeModal('profileModal');
+  updateHeaderUI();
+  showToast('✅ Signed out.');
+}
+
+function updateHeaderUI() {
+  const u   = getUser();
+  const btn = document.getElementById('profileBtnInner');
+  if (!btn) return;
+  if (u) {
+    const ini = (u.firstName[0]+(u.lastName[0]||'')).toUpperCase();
+    btn.innerHTML = `<span class="profile-initial">${ini}</span> ${u.firstName}`;
+  } else {
+    btn.innerHTML = '🔑 Login';
+  }
+}
+
+// ── Auth overlay open/close ───────────────────────────────
+function openProfileOrAuth() { isLoggedIn() ? openProfile() : openAuth(); }
+
+function openAuth(tab) {
+  document.getElementById('authOverlay').classList.add('open');
+  switchAuthTab(tab||'register');
+}
+function closeAuth() { document.getElementById('authOverlay').classList.remove('open'); }
+
+function switchAuthTab(tab) {
+  document.getElementById('authTabRegister').classList.toggle('active', tab==='register');
+  document.getElementById('authTabLogin').classList.toggle('active',    tab==='login');
+  document.getElementById('authFormRegister').classList.toggle('active', tab==='register');
+  document.getElementById('authFormLogin').classList.toggle('active',    tab==='login');
+}
+
+// ── Profile modal ────────────────────────────────────────
+function openProfile() {
+  const u = getUser(); if (!u) { openAuth(); return; }
+  const ini = (u.firstName[0]+(u.lastName[0]||'')).toUpperCase();
+  document.getElementById('profileAvatar').textContent    = ini;
+  document.getElementById('profileFullname').textContent  = `${u.firstName} ${u.lastName}`;
+  document.getElementById('profileEmailTxt').textContent  = u.email;
+  const labels = {admin:'🔧 Admin', station_manager:'🏢 Station Manager', user:'👤 User'};
+  document.getElementById('profileRoleChip').textContent  = labels[u.role]||'👤 User';
+
+  const subs = DB.pending.getAll().filter(p => p.submittedBy===u.id).length;
+  const mgd  = (u.managedStations||[]).length;
+  document.getElementById('profileSubCount').textContent = subs;
+  document.getElementById('profileMgdCount').textContent = mgd;
+
+  let menu = '';
+  if (isAdmin(u)||isMgr(u)) menu += `<button class="pmi" onclick="closeModal('profileModal');openAdminPanel()"><span class="pmi-icon">🔧</span> Admin Panel <span class="pmi-chevron">›</span></button>`;
+  menu += `<button class="pmi" onclick="closeModal('profileModal');openAddStation()"><span class="pmi-icon">➕</span> Add a Station <span class="pmi-chevron">›</span></button>`;
+  menu += `<button class="pmi" onclick="closeModal('profileModal');openAdvertise()"><span class="pmi-icon">📣</span> Advertise with Us <span class="pmi-chevron">›</span></button>`;
+  menu += `<button class="pmi danger" onclick="authLogout()"><span class="pmi-icon">🚪</span> Sign Out</button>`;
+  document.getElementById('profileMenuItems').innerHTML = menu;
+  openModal('profileModal');
+}
+
+// ── Logo tap hidden trigger (5 taps → admin gate) ────────
+let _ltaps=0, _ltimer=null;
+function logoTap() {
+  _ltaps++; clearTimeout(_ltimer);
+  _ltimer = setTimeout(()=>{ _ltaps=0; }, 2500);
+  if (_ltaps>=5) { _ltaps=0; isAdmin() ? openAdminPanel() : openAdminGate(); }
+}
+function openAdminGate()  { document.getElementById('adminGate').classList.add('open'); }
+function closeAdminGate() { document.getElementById('adminGate').classList.remove('open'); }
+
+// ════════════════════════════════════════════════════════════
+//  ADMIN PANEL
+// ════════════════════════════════════════════════════════════
+function openAdminPanel() {
+  if (!isAdmin()) { showToast('⚠️ Admin access required'); return; }
+  document.getElementById('adminOverlay').classList.add('open');
+  renderAdminTab('overview');
+}
+function closeAdmin() { document.getElementById('adminOverlay').classList.remove('open'); }
+
+function switchAdminTab(tab, btn) {
+  document.querySelectorAll('.admin-tab-pill').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  const sec = document.getElementById(`admin-tab-${tab}`);
+  if (sec) sec.classList.add('active');
+  renderAdminTab(tab);
+}
+
+function renderAdminTab(tab) {
+  if (tab==='overview')  renderAdminOverview();
+  if (tab==='users')     renderAdminUsers();
+  if (tab==='stations')  renderAdminStations();
+  if (tab==='claims')    renderAdminClaims();
+  if (tab==='ads')       renderAdminAds();
+  if (tab==='log')       renderAdminLog();
+}
+
+function renderAdminOverview() {
+  const users   = DB.users.getAll().filter(u=>u.role!=='admin');
+  const pend    = DB.pending.getAll().filter(p=>p.status==='pending');
+  const claims  = DB.claims.getAll().filter(c=>c.status==='pending');
+  const enqs    = DB.enquiries.getAll().filter(e=>e.status==='new');
+  document.getElementById('adminOverviewStats').innerHTML = `
+    <div class="admin-stat-card"><div class="admin-stat-num green">${users.length}</div><div class="admin-stat-label">Registered Users</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-num orange">${pend.length}</div><div class="admin-stat-label">Pending Stations</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-num purple">${claims.length}</div><div class="admin-stat-label">Pending Claims</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-num blue">${enqs.length}</div><div class="admin-stat-label">New Ad Enquiries</div></div>`;
+  const log = DB.audit.getAll().slice(0,8);
+  document.getElementById('adminRecentLog').innerHTML = log.length===0
+    ? '<div class="admin-empty">No activity yet</div>'
+    : log.map(l=>`<div class="audit-item"><div class="audit-dot"></div><div style="flex:1;min-width:0"><strong>${l.action.replace(/_/g,' ')}</strong><div style="color:var(--gray-600);margin-top:2px">${l.actorName}${l.details?': '+l.details:''}</div></div><div class="audit-time">${fmtShort(l.timestamp)}</div></div>`).join('');
+}
+
+function renderAdminUsers() {
+  const users = DB.users.getAll();
+  document.getElementById('adminUsersBody').innerHTML = users.length===0
+    ? '<tr><td colspan="7" class="admin-empty">No registered users yet</td></tr>'
+    : users.map(u=>`
+      <tr>
+        <td><strong>${u.firstName} ${u.lastName}</strong></td>
+        <td>${u.email}</td>
+        <td>${u.phone||'—'}</td>
+        <td>${u.state||'—'}</td>
+        <td><span class="badge-role badge-${u.role}">${u.role}</span></td>
+        <td>${fmtShort(u.createdAt)}</td>
+        <td style="display:flex;gap:4px;flex-wrap:wrap">
+          ${u.role==='user'?`<button class="btn-admin btn-approve" onclick="promoteUser('${u.id}')">Make Manager</button>`:''}
+          ${u.role==='station_manager'?`<button class="btn-admin btn-neutral" onclick="demoteUser('${u.id}')">Demote</button>`:''}
+        </td>
+      </tr>`).join('');
+}
+
+function renderAdminStations() {
+  const all = DB.pending.getAll();
+  const el  = document.getElementById('adminPendingList');
+  if (all.length===0) { el.innerHTML='<div class="admin-empty">No submissions yet</div>'; return; }
+  el.innerHTML = all.map(s=>`
+    <div style="border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;border-left:4px solid ${s.status==='pending'?'var(--limited)':s.status==='approved'?'var(--available)':'var(--unavailable)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+        <div>
+          <div style="font-weight:700;font-size:14px">${s.name}</div>
+          <div style="font-size:12px;color:var(--gray-600)">${s.area}, ${s.state} · ${s.brand}</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:2px">By: ${s.submittedByName||'Unknown'} · ${fmtDate(s.submittedAt)}</div>
+          ${s.rejectionReason?`<div style="font-size:11px;color:var(--unavailable);margin-top:4px">Rejected: ${s.rejectionReason}</div>`:''}
+        </div>
+        <span class="badge-role badge-${s.status}">${s.status}</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:${s.status==='pending'?'10':'0'}px">
+        <span style="background:var(${s.petrol==='available'?'--available-bg':'--unavailable-bg'});color:var(${s.petrol==='available'?'--available':'--unavailable'});padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600">⛽ ${cap(s.petrol)}</span>
+        <span style="background:var(${s.diesel==='available'?'--available-bg':'--unavailable-bg'});color:var(${s.diesel==='available'?'--available':'--unavailable'});padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600">🛢️ ${cap(s.diesel)}</span>
+      </div>
+      ${s.status==='pending'?`<div style="display:flex;gap:8px"><button class="btn-admin btn-approve" onclick="approveStation('${s.id}')">✅ Approve</button><button class="btn-admin btn-reject" onclick="rejectStation('${s.id}')">❌ Reject</button></div>`:''}
+    </div>`).join('');
+}
+
+function renderAdminClaims() {
+  const all = DB.claims.getAll();
+  const el  = document.getElementById('adminClaimsList');
+  if (all.length===0) { el.innerHTML='<div class="admin-empty">No station claims yet</div>'; return; }
+  el.innerHTML = all.map(c=>`
+    <div style="border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;border-left:4px solid ${c.status==='pending'?'var(--limited)':c.status==='approved'?'var(--available)':'var(--unavailable)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-weight:700;font-size:14px">${c.stationName}</div>
+          <div style="font-size:12px;color:var(--gray-600)">${c.userName} · ${c.businessName||'No business name'}</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:2px">Reg: ${c.businessReg||'N/A'} · 📞 ${c.phone}</div>
+          ${c.notes?`<div style="font-size:11px;color:var(--gray-600);margin-top:4px;font-style:italic">"${c.notes}"</div>`:''}
+          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">${fmtDate(c.submittedAt)}</div>
+        </div>
+        <span class="badge-role badge-${c.status}">${c.status}</span>
+      </div>
+      ${c.status==='pending'?`<div style="display:flex;gap:8px"><button class="btn-admin btn-approve" onclick="approveClaim('${c.id}')">✅ Approve</button><button class="btn-admin btn-reject" onclick="rejectClaim('${c.id}')">❌ Reject</button></div>`:''}
+    </div>`).join('');
+}
+
+function renderAdminAds() {
+  const all = DB.enquiries.getAll();
+  const el  = document.getElementById('adminAdsList');
+  if (all.length===0) { el.innerHTML='<div class="admin-empty">No ad enquiries yet</div>'; return; }
+  el.innerHTML = all.map(a=>`
+    <div style="border:1.5px solid var(--ad-border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;background:var(--ad-bg)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-weight:700;font-size:14px">${a.name}${a.company?' — '+a.company:''}</div>
+          <div style="font-size:12px;color:var(--gray-600)">📞 ${a.phone}${a.email?' · ✉ '+a.email:''}</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:2px">Budget: ${a.budget||'N/A'} · ${a.placement}</div>
+          ${a.message?`<div style="font-size:12px;color:var(--gray-600);margin-top:6px;padding:8px;background:white;border-radius:6px">${a.message}</div>`:''}
+          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">${fmtDate(a.submittedAt)}</div>
+        </div>
+        <span class="badge-role badge-${a.status}">${a.status}</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-admin btn-neutral"  onclick="setEnqStatus('${a.id}','contacted')">Contacted</button>
+        <button class="btn-admin btn-approve"  onclick="setEnqStatus('${a.id}','active')">Active</button>
+        <button class="btn-admin btn-reject"   onclick="setEnqStatus('${a.id}','declined')">Decline</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderAdminLog() {
+  const log = DB.audit.getAll().slice(0,100);
+  document.getElementById('adminAuditList').innerHTML = log.length===0
+    ? '<div class="admin-empty">No actions logged yet</div>'
+    : log.map(l=>`<div class="audit-item"><div class="audit-dot"></div><div style="flex:1;min-width:0"><strong>${l.action.replace(/_/g,' ')}</strong><div style="color:var(--gray-600);margin-top:2px">${l.actorName}${l.details?': '+l.details:''}</div></div><div class="audit-time">${fmtDate(l.timestamp)}</div></div>`).join('');
+}
+
+// ── Admin Actions ─────────────────────────────────────────
+function approveStation(id) {
+  const s = DB.pending.getAll().find(p=>p.id===id); if (!s) return;
+  DB.pending.update(id, {status:'approved', reviewedBy:getUser().id, reviewedAt:nowISO()});
+  const live = getUserStations(); live.unshift({...s, status:'approved', isUserAdded:true});
+  saveUserStations(live);
+  const a = getUser();
+  DB.audit.add({id:genId(),action:'STATION_APPROVED',actorId:a.id,actorName:`${a.firstName} ${a.lastName}`,details:`Approved: ${s.name}`,timestamp:nowISO()});
+  renderAdminStations(); renderAdminOverview();
+  showToast(`✅ "${s.name}" approved and now live`);
+  if (currentMode==='nearby'&&userLat!==null) loadNearbyStations();
+  else if (s.state===currentState) loadState(currentState);
+}
+
+function rejectStation(id) {
+  const reason = prompt('Rejection reason (optional):')||'Does not meet listing criteria';
+  const s = DB.pending.getAll().find(p=>p.id===id);
+  DB.pending.update(id, {status:'rejected', rejectionReason:reason, reviewedBy:getUser().id, reviewedAt:nowISO()});
+  const a = getUser();
+  DB.audit.add({id:genId(),action:'STATION_REJECTED',actorId:a.id,actorName:`${a.firstName} ${a.lastName}`,details:`Rejected: ${s?s.name:id}`,timestamp:nowISO()});
+  renderAdminStations(); showToast('Station rejected.');
+}
+
+function approveClaim(id) {
+  const c = DB.claims.getAll().find(x=>x.id===id); if (!c) return;
+  const target = DB.users.find(c.userId);
+  if (target) {
+    const managed = [...(target.managedStations||[]), c.stationId];
+    DB.users.update(c.userId, {role:'station_manager', managedStations:managed});
+    const sess = getUser();
+    if (sess&&sess.id===c.userId) DB.session.set({...sess, role:'station_manager', managedStations:managed});
+  }
+  DB.meta.set(c.stationId, {ownerId:c.userId, ownerName:c.userName, businessName:c.businessName});
+  DB.claims.update(id, {status:'approved', reviewedAt:nowISO()});
+  const a = getUser();
+  DB.audit.add({id:genId(),action:'CLAIM_APPROVED',actorId:a.id,actorName:`${a.firstName} ${a.lastName}`,details:`${c.userName} approved as manager of ${c.stationName}`,timestamp:nowISO()});
+  renderAdminClaims(); renderAdminOverview();
+  showToast(`✅ ${c.userName} is now Station Manager for "${c.stationName}"`);
+}
+
+function rejectClaim(id) {
+  DB.claims.update(id, {status:'rejected', reviewedAt:nowISO()});
+  const a = getUser();
+  DB.audit.add({id:genId(),action:'CLAIM_REJECTED',actorId:a.id,actorName:`${a.firstName} ${a.lastName}`,details:`Claim ${id} rejected`,timestamp:nowISO()});
+  renderAdminClaims(); showToast('Claim rejected.');
+}
+
+function promoteUser(uid) {
+  DB.users.update(uid, {role:'station_manager'});
+  const a = getUser(); const t = DB.users.find(uid);
+  DB.audit.add({id:genId(),action:'USER_PROMOTED',actorId:a.id,actorName:`${a.firstName} ${a.lastName}`,details:`Promoted ${t?t.email:uid} to Station Manager`,timestamp:nowISO()});
+  renderAdminUsers(); showToast('User promoted to Station Manager.');
+}
+
+function demoteUser(uid) {
+  DB.users.update(uid, {role:'user'});
+  renderAdminUsers(); showToast('User demoted to User role.');
+}
+
+function setEnqStatus(id, status) {
+  DB.enquiries.update(id, {status}); renderAdminAds();
+  showToast(`Ad enquiry marked as "${status}"`);
+}
+
+function exportUsersCSV() {
+  const users = DB.users.getAll();
+  const headers = ['ID','First Name','Last Name','Email','Phone','State','Role','Joined','Last Login'];
+  const rows = users.map(u=>[u.id,u.firstName,u.lastName,u.email,u.phone,u.state,u.role,u.createdAt,u.lastLogin||''].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
+  const csv  = [headers.join(','),...rows].join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url  = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`fuelnow_users_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('⬇ User data exported as CSV');
+}
+
+// ════════════════════════════════════════════════════════════
+//  CLAIM STATION
+// ════════════════════════════════════════════════════════════
+let claimStationId=null, claimStationName=null;
+
+function openClaim(stationId, stationName, event) {
+  if (event) event.stopPropagation();
+  if (!isLoggedIn()) { pendingAction=()=>openClaim(stationId,stationName); openAuth(); return; }
+  const u = getUser();
+  const existing = DB.claims.getAll().find(c=>c.stationId===stationId&&c.userId===u.id);
+  if (existing) { showToast(`⚠️ You already submitted a claim for this station (${existing.status})`); return; }
+  claimStationId=stationId; claimStationName=stationName;
+  document.getElementById('claimStationLabel').textContent = stationName;
+  document.getElementById('claim_business').value='';
+  document.getElementById('claim_reg').value='';
+  document.getElementById('claim_phone').value=u.phone||'';
+  document.getElementById('claim_notes').value='';
+  openModal('claimModal');
+}
+
+function submitClaim() {
+  const u        = getUser();
+  const business = document.getElementById('claim_business').value.trim();
+  const reg      = document.getElementById('claim_reg').value.trim();
+  const phone    = document.getElementById('claim_phone').value.trim();
+  const notes    = document.getElementById('claim_notes').value.trim();
+  if (!business) { showToast('⚠️ Business name is required'); return; }
+  if (!phone)    { showToast('⚠️ Manager phone is required'); return; }
+  DB.claims.add({
+    id:genId(), stationId:claimStationId, stationName:claimStationName,
+    userId:u.id, userName:`${u.firstName} ${u.lastName}`,
+    businessName:business, businessReg:reg, phone, notes,
+    status:'pending', submittedAt:nowISO(), reviewedAt:null,
+  });
+  DB.audit.add({id:genId(),action:'CLAIM_SUBMITTED',actorId:u.id,actorName:`${u.firstName} ${u.lastName}`,details:`Claimed: ${claimStationName}`,timestamp:nowISO()});
+  closeModal('claimModal');
+  showToast('✅ Claim submitted! Admin will review within 24 hours.');
+}
+
+// ════════════════════════════════════════════════════════════
+//  STATION MANAGER — Edit station info
+// ════════════════════════════════════════════════════════════
+let editSel = {petrol:null, diesel:null, queue:null};
+
+function openEditStation(stationId, stationName, event) {
+  if (event) event.stopPropagation();
+  if (!isMgr()) { showToast('⚠️ Station manager access required'); return; }
+  editSel = {petrol:null, diesel:null, queue:null};
+  document.getElementById('edit_stationId').value = stationId;
+  document.getElementById('editStationLabel').textContent = stationName;
+  const meta = DB.meta.get(stationId)||{};
+  document.getElementById('edit_phone').value       = meta.phone||'';
+  document.getElementById('edit_hours').value       = meta.hours||'';
+  document.getElementById('edit_petrolPrice').value = meta.petrolPrice||'';
+  document.querySelectorAll('#edit_petrolOptions .status-option,#edit_dieselOptions .status-option').forEach(el=>{ el.className='status-option'; });
+  document.querySelectorAll('#edit_queueOptions .queue-opt').forEach(el=>el.classList.remove('selected'));
+  openModal('editStationModal');
+}
+
+function submitStationEdit() {
+  const sid = document.getElementById('edit_stationId').value;
+  const u   = getUser();
+  const upd = {
+    phone:       document.getElementById('edit_phone').value.trim(),
+    hours:       document.getElementById('edit_hours').value.trim(),
+    petrolPrice: document.getElementById('edit_petrolPrice').value.trim(),
+    lastUpdatedBy: u.id, lastUpdated: nowISO(),
+  };
+  if (editSel.petrol) upd.petrol = editSel.petrol;
+  if (editSel.diesel) upd.diesel = editSel.diesel;
+  if (editSel.queue)  upd.queue  = editSel.queue;
+  DB.meta.set(sid, upd);
+
+  // Also update live station if it's user-added
+  const live = getUserStations().map(s => {
+    if (s.id!==sid) return s;
+    return {...s, ...(upd.petrol?{petrol:upd.petrol}:{}), ...(upd.diesel?{diesel:upd.diesel}:{}), ...(upd.queue?{queue:upd.queue}:{}), minutesAgo:0};
+  });
+  saveUserStations(live);
+
+  DB.audit.add({id:genId(),action:'STATION_UPDATED',actorId:u.id,actorName:`${u.firstName} ${u.lastName}`,details:`Updated station ${sid}`,timestamp:nowISO()});
+  closeModal('editStationModal');
+  showToast('✅ Station information updated!');
+  if (currentMode==='nearby'&&userLat!==null) loadNearbyStations();
+  else if (currentState) loadState(currentState);
 }
 
 // ── Install ────────────────────────────────────────────────
