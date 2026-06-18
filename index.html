@@ -564,7 +564,7 @@ select {
 .market-prices-bar {
   background:linear-gradient(135deg,#0f3460 0%,#16213e 100%);
   border-radius:var(--radius); padding:14px 14px 10px; margin-bottom:14px;
-  color:white; box-shadow:var(--shadow-lg); display:none;
+  color:white; box-shadow:var(--shadow-lg);
 }
 .mpb-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
 .mpb-title  { font-size:11px; font-weight:700; opacity:0.8; text-transform:uppercase; letter-spacing:0.5px; }
@@ -572,10 +572,10 @@ select {
 .mpb-live-dot { width:6px; height:6px; border-radius:50%; background:#4ade80; animation:pulse-dot 1.5s infinite; }
 .mpb-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:8px; }
 @media (max-width:380px) { .mpb-grid { grid-template-columns:1fr 1fr; } }
-.mpb-item  { text-align:center; background:rgba(255,255,255,0.08); border-radius:var(--radius-sm); padding:8px 4px; }
-.mpb-icon  { font-size:16px; margin-bottom:2px; display:block; }
+.mpb-item  { text-align:center; background:rgba(255,255,255,0.08); border-radius:var(--radius-sm); padding:10px 4px 8px; }
+.mpb-icon  { font-size:18px; margin-bottom:3px; display:block; }
 .mpb-fuel  { font-size:9px; opacity:0.7; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; display:block; }
-.mpb-price { font-size:14px; font-weight:800; margin-top:3px; display:block; }
+.mpb-price { font-size:15px; font-weight:800; margin-top:4px; display:block; letter-spacing:-0.3px; }
 .mpb-sub   { font-size:10px; opacity:0.5; text-align:center; }
 
 /* ══ PRICE INPUT GRID (modals) ════════════════════════════════ */
@@ -648,6 +648,21 @@ select {
 <!-- ══ MAIN ══ -->
 <main class="main" id="mainContent">
 
+  <!-- ── Persistent Fuel Price Bar (always visible) ── -->
+  <div class="market-prices-bar" id="marketPricesBar">
+    <div class="mpb-header">
+      <span class="mpb-title">⛽ Nigeria Pump Prices</span>
+      <span class="mpb-live"><span class="mpb-live-dot"></span>LIVE</span>
+    </div>
+    <div class="mpb-grid">
+      <div class="mpb-item"><span class="mpb-icon">⛽</span><span class="mpb-fuel">Petrol/L</span><span class="mpb-price" id="mpb_petrol">—</span></div>
+      <div class="mpb-item"><span class="mpb-icon">🛢️</span><span class="mpb-fuel">Diesel/L</span><span class="mpb-price" id="mpb_diesel">—</span></div>
+      <div class="mpb-item"><span class="mpb-icon">🔵</span><span class="mpb-fuel">Kerosene/L</span><span class="mpb-price" id="mpb_kerosene">—</span></div>
+      <div class="mpb-item"><span class="mpb-icon">🟡</span><span class="mpb-fuel">LPG Gas/kg</span><span class="mpb-price" id="mpb_gas">—</span></div>
+    </div>
+    <div class="mpb-sub" id="mpb_updated">Tap a station card to update prices</div>
+  </div>
+
   <!-- ── Welcome Screen ── -->
   <div id="welcomeState">
     <!-- AD SLOT: welcome-top (banner) -->
@@ -680,21 +695,6 @@ select {
 
     <!-- Stats -->
     <div class="stats-bar" id="statsBar"></div>
-
-    <!-- Market Price Reference Bar -->
-    <div class="market-prices-bar" id="marketPricesBar">
-      <div class="mpb-header">
-        <span class="mpb-title">📊 Current Pump Prices — Nigeria</span>
-        <span class="mpb-live"><span class="mpb-live-dot"></span>LIVE</span>
-      </div>
-      <div class="mpb-grid">
-        <div class="mpb-item"><span class="mpb-icon">⛽</span><span class="mpb-fuel">Petrol</span><span class="mpb-price" id="mpb_petrol">—</span></div>
-        <div class="mpb-item"><span class="mpb-icon">🛢️</span><span class="mpb-fuel">Diesel</span><span class="mpb-price" id="mpb_diesel">—</span></div>
-        <div class="mpb-item"><span class="mpb-icon">🔵</span><span class="mpb-fuel">Kerosene</span><span class="mpb-price" id="mpb_kerosene">—</span></div>
-        <div class="mpb-item"><span class="mpb-icon">🟡</span><span class="mpb-fuel">LPG Gas</span><span class="mpb-price" id="mpb_gas">—</span></div>
-      </div>
-      <div class="mpb-sub">Market reference prices · Per-station prices shown on each card</div>
-    </div>
 
     <!-- AD SLOT: results-top (banner) -->
     <div id="ad-slot-results-top"></div>
@@ -1487,6 +1487,8 @@ window.addEventListener('DOMContentLoaded', () => {
   registerSW();
   renderAllAdSlots();
   updateHeaderUI();     // show profile button state
+  renderMarketPricesBar();              // show prices immediately on load
+  setInterval(renderMarketPricesBar, 60000); // refresh every 60 s
 
   const saved = localStorage.getItem('fuelnow_state');
   if (saved && STATE_CENTERS[saved]) {
@@ -1757,7 +1759,7 @@ function renderStats() {
     <div class="stat-card"><div class="stat-num green">${avail}</div><div class="stat-label">Has Fuel</div></div>
     <div class="stat-card"><div class="stat-num orange">${lim}</div><div class="stat-label">Limited</div></div>
     <div class="stat-card"><div class="stat-num red">${none}</div><div class="stat-label">No Fuel</div></div>`;
-  renderMarketPricesBar();
+  renderMarketPricesBar(); // re-average whenever new stations are rendered
 }
 
 function renderStations() {
@@ -1858,29 +1860,47 @@ function fuelCell(icon, label, statusCls, price, unit) {
 }
 
 // ── Market Reference Prices ────────────────────────────────
-const DEFAULT_MARKET_PRICES = { petrol: 935, diesel: 1200, kerosene: 900, gas: 1400 };
+// Default prices reflect current Nigerian pump rates (June 2025)
+const DEFAULT_MARKET_PRICES = { petrol: 935, diesel: 1330, kerosene: 1050, gas: 1500 };
+
 function getMarketPrices() {
   try { return { ...DEFAULT_MARKET_PRICES, ...JSON.parse(localStorage.getItem('fn_market_prices') || '{}') }; } catch { return DEFAULT_MARKET_PRICES; }
 }
 function setMarketPrices(data) {
-  localStorage.setItem('fn_market_prices', JSON.stringify({ ...getMarketPrices(), ...data }));
+  localStorage.setItem('fn_market_prices', JSON.stringify({ ...getMarketPrices(), ...data, _updatedAt: Date.now() }));
 }
 function renderMarketPricesBar() {
   const bar = document.getElementById('marketPricesBar');
   if (!bar) return;
-  // Aggregate any station-reported prices and average them; fall back to defaults
+  // Start with defaults then average any community-reported prices (need ≥ 2 reports to move the needle)
   const mp = getMarketPrices();
   const allMeta = DB.meta.getAll();
   ['petrol','diesel','kerosene','gas'].forEach(k => {
     const key = k === 'gas' ? 'gasPrice' : k === 'kerosene' ? 'keroPrice' : k + 'Price';
-    const vals = Object.values(allMeta).map(m => parseFloat(m[key])).filter(v => v > 0);
-    if (vals.length >= 2) mp[k] = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+    const vals = Object.values(allMeta).map(m => parseFloat(m[key])).filter(v => v > 100);
+    if (vals.length >= 2) {
+      const avg = Math.round(vals.reduce((a,b)=>a+b,0) / vals.length);
+      mp[k] = avg;
+      // Persist community average back so it survives refreshes
+      const stored = getMarketPrices();
+      stored[k] = avg; stored._updatedAt = Date.now();
+      localStorage.setItem('fn_market_prices', JSON.stringify(stored));
+    }
   });
-  bar.style.display = '';
-  document.getElementById('mpb_petrol').textContent   = '₦' + Number(mp.petrol).toLocaleString('en-NG')   + '/L';
-  document.getElementById('mpb_diesel').textContent   = '₦' + Number(mp.diesel).toLocaleString('en-NG')   + '/L';
-  document.getElementById('mpb_kerosene').textContent = '₦' + Number(mp.kerosene).toLocaleString('en-NG') + '/L';
-  document.getElementById('mpb_gas').textContent      = '₦' + Number(mp.gas).toLocaleString('en-NG')      + '/kg';
+  document.getElementById('mpb_petrol').textContent   = '₦' + Number(mp.petrol).toLocaleString('en-NG');
+  document.getElementById('mpb_diesel').textContent   = '₦' + Number(mp.diesel).toLocaleString('en-NG');
+  document.getElementById('mpb_kerosene').textContent = '₦' + Number(mp.kerosene).toLocaleString('en-NG');
+  document.getElementById('mpb_gas').textContent      = '₦' + Number(mp.gas).toLocaleString('en-NG');
+  // Timestamp line
+  const sub = document.getElementById('mpb_updated');
+  if (sub) {
+    const ts = mp._updatedAt;
+    const ago = ts ? Math.round((Date.now()-ts)/60000) : null;
+    const communityReports = Object.values(allMeta).filter(m=>m.petrolPrice||m.dieselPrice).length;
+    sub.textContent = communityReports > 0
+      ? `Crowd-averaged from ${communityReports} station report${communityReports!==1?'s':''} · ${ago!=null&&ago<60?ago+' min ago':'just now'}`
+      : 'NNPCL reference rates · updated daily · tap Report on any station to add a price';
+  }
 }
 
 // ── Ad Rendering ───────────────────────────────────────────
@@ -1968,6 +1988,7 @@ function submitReport() {
   closeModal('reportModal');
   renderStats();
   applyFilters();
+  renderMarketPricesBar(); // update top bar with latest community price data
   showToast('✅ Report submitted! Thank you for helping others.');
 }
 
@@ -2698,6 +2719,7 @@ function submitStationEdit() {
 
   DB.audit.add({id:genId(),action:'STATION_UPDATED',actorId:u.id,actorName:`${u.firstName} ${u.lastName}`,details:`Updated station ${sid}`,timestamp:nowISO()});
   closeModal('editStationModal');
+  renderMarketPricesBar(); // update top bar with manager's new prices
   showToast('✅ Station information updated!');
   if (currentMode==='nearby'&&userLat!==null) loadNearbyStations();
   else if (currentState) loadState(currentState);
