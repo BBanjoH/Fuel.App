@@ -1025,9 +1025,6 @@ select {
       <button class="btn-submit" style="width:100%;margin-top:4px" onclick="doLogin()">🔑 Sign In</button>
     </div>
   </div>
-  <div class="auth-skip">
-    <button onclick="closeAuth()">Browse without an account →</button>
-  </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -1490,14 +1487,19 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(updateTimestamp, 60000);
   registerSW();
   renderAllAdSlots();
-  updateHeaderUI();     // show profile button state
-  renderMarketPricesBar();              // show prices immediately on load
-  setInterval(renderMarketPricesBar, 60000); // refresh every 60 s
+  updateHeaderUI();
+  renderMarketPricesBar();
+  setInterval(renderMarketPricesBar, 60000);
 
-  const saved = localStorage.getItem('fuelnow_state');
-  if (saved && STATE_CENTERS[saved]) {
-    document.getElementById('stateSelect').value = saved;
-    loadState(saved);
+  // Require login before the app is usable
+  if (!isLoggedIn()) {
+    openAuth('register');
+  } else {
+    const saved = localStorage.getItem('fuelnow_state');
+    if (saved && STATE_CENTERS[saved]) {
+      document.getElementById('stateSelect').value = saved;
+      loadState(saved);
+    }
   }
 });
 
@@ -2384,7 +2386,17 @@ function openAuth(tab) {
   document.getElementById('authOverlay').classList.add('open');
   switchAuthTab(tab||'register');
 }
-function closeAuth() { document.getElementById('authOverlay').classList.remove('open'); }
+function closeAuth() {
+  // Only allow closing if the user is logged in — registration is required
+  if (!isLoggedIn()) return;
+  document.getElementById('authOverlay').classList.remove('open');
+  // Restore the last viewed state after login
+  const saved = localStorage.getItem('fuelnow_state');
+  if (saved && STATE_CENTERS[saved] && !currentState) {
+    document.getElementById('stateSelect').value = saved;
+    loadState(saved);
+  }
+}
 
 function switchAuthTab(tab) {
   document.getElementById('authTabRegister').classList.toggle('active', tab==='register');
