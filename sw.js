@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fuelnow-v8';
+const CACHE_NAME = 'fuelnow-v9';
 const STATIC_ASSETS = [
   '/fuel/',
   '/fuel/index.html',
